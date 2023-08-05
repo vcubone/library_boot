@@ -1,0 +1,1 @@
+INSERT INTO `book`(`title`, `author`, `releaseYear`) VALUES ('titleT','authorT', 500);
