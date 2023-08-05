@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import ru.batorov.library.models.Person;
 import ru.batorov.library.services.PeopleService;
 import ru.batorov.library.util.PersonValidator;
