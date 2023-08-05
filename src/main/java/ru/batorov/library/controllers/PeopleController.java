@@ -1,7 +1,6 @@
 package ru.batorov.library.controllers;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -24,7 +23,6 @@ public class PeopleController {
     private final PersonValidator personValidator;
     private final PeopleService peopleService;
     
-    @Autowired
     public PeopleController(PersonValidator personValidator, PeopleService peopleService) {
         this.personValidator = personValidator;
         this.peopleService = peopleService;

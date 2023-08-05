@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Hibernate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +18,6 @@ import ru.batorov.library.repositories.PeopleRepository;
 public class PeopleService {
     private final PeopleRepository peopleRepository;
 
-    @Autowired
     public PeopleService(PeopleRepository peopleRepository) {
         this.peopleRepository = peopleRepository;
     }

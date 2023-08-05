@@ -2,7 +2,6 @@ package ru.batorov.library.util;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -17,7 +16,6 @@ public class PersonValidator implements Validator{
 
     private final PeopleService peopleService;
     
-    @Autowired
     public PersonValidator(PeopleService peopleService) {
         this.peopleService = peopleService;
     }

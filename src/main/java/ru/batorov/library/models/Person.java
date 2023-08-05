@@ -1,5 +1,6 @@
 package ru.batorov.library.models;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.persistence.Column;
@@ -30,6 +31,11 @@ public class Person {
     
     @OneToMany(mappedBy = "owner")
     private List<Book> books;
+    
+    @Column(name = "created_at")
+	private LocalDateTime created_at;
+	@Column(name = "updated_at")
+	private LocalDateTime updated_at;
     
     public Person() {
     }
@@ -63,4 +69,17 @@ public class Person {
     public void setBooks(List<Book> books) {
         this.books = books;
     }
+    public LocalDateTime getCreated_at() {
+        return created_at;
+    }
+    public void setCreated_at(LocalDateTime created_at) {
+        this.created_at = created_at;
+    }
+    public LocalDateTime getUpdated_at() {
+        return updated_at;
+    }
+    public void setUpdated_at(LocalDateTime updated_at) {
+        this.updated_at = updated_at;
+    }
+    
 }
