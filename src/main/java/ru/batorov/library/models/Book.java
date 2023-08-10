@@ -6,6 +6,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -23,9 +24,9 @@ public class Book {
     @Id
     @Column(name = "bookId")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int bookId;
+    private Integer bookId;
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "personId", referencedColumnName = "personId")
     private Person owner;
     
@@ -41,7 +42,7 @@ public class Book {
     
     @Column(name = "releaseYear")
     @Min(value = 0, message = "release_year > 0")
-    private int releaseYear;
+    private Integer releaseYear;
     
     @Column(name = "takeTime")
     @Temporal(TemporalType.TIMESTAMP)
@@ -67,11 +68,11 @@ public class Book {
         this.releaseYear = releaseYear;
     }
 
-    public int getBookId() {
+    public Integer getBookId() {
         return bookId;
     }
 
-    public void setBookId(int bookId) {
+    public void setBookId(Integer bookId) {
         this.bookId = bookId;
     }
 
@@ -99,11 +100,11 @@ public class Book {
         this.author = author;
     }
 
-    public int getReleaseYear() {
+    public Integer getReleaseYear() {
         return releaseYear;
     }
 
-    public void setReleaseYear(int releaseYear) {
+    public void setReleaseYear(Integer releaseYear) {
         this.releaseYear = releaseYear;
     }
 

@@ -3,7 +3,6 @@ package ru.batorov.library.services;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,17 +10,20 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.batorov.library.models.Book;
 import ru.batorov.library.models.Person;
 import ru.batorov.library.repositories.PeopleRepository;
+import ru.batorov.library.util.CopyHelper;
 
 
 @Service
 @Transactional(readOnly = true)
 public class PeopleService {
     private final PeopleRepository peopleRepository;
-
-    public PeopleService(PeopleRepository peopleRepository) {
-        this.peopleRepository = peopleRepository;
-    }
+    private final CredentialsService credentialsService;
     
+    public PeopleService(PeopleRepository peopleRepository, CredentialsService credentialsService) {
+        this.peopleRepository = peopleRepository;
+        this.credentialsService = credentialsService;
+    }
+
     public List<Person> all()
     {
         return peopleRepository.findAll();
@@ -37,12 +39,19 @@ public class PeopleService {
     {
         peopleRepository.save(person);
     }
-    
+    @Transactional
+    public void register(Person person)
+    {
+        credentialsService.enrichCredentials(person.getCredentials());
+        save(person);
+    }
+        
     @Transactional
     public void update(int person_id, Person person)
     {
-        person.setPersonId(person_id);
-        peopleRepository.save(person);
+        Person personToBeUpdated = show(person_id);
+        CopyHelper.copyNotNullProperties(person, personToBeUpdated);
+        peopleRepository.save(personToBeUpdated);
     }
     
     @Transactional

@@ -17,19 +17,13 @@
             <input type="submit" value="Искать!"/>
         </form>
         
-        <div th:if="${books}">
-            <div th:if="${books.isEmpty()}">
+        <div th:if="${bookUserDTOs}">
+            <div th:if="${bookUserDTOs.isEmpty()}">
                 Книг не найдено
             </div>
             
-            <div th:each="book : ${books}">
-                <a th:href="@{/books/{id}(id=${book.getBookId()})}" th:text="${book.getTitle() + ', ' + book.getAuthor() + ', ' + book.getReleaseYear}">book</a>
-                <div th:if="${book.getOwner() == null}">
-                    Книга свободна
-                </div>
-                <div th:unless="${book.getOwner() == null}">
-                    <span>Книга сейчас у: </span> <span th:text="${book.getOwner().getFullName()}">Person Name</span>
-                </div>
+            <div th:each="bookUserDTO : ${bookUserDTOs}">
+                <a th:href="@{/books/{id}(id=${bookUserDTO.getBookId()})}" th:text="${bookUserDTO.getTitle() + ', ' + bookUserDTO.getAuthor() + ', ' + bookUserDTO.getReleaseYear}">bookUserDTO</a>
             </div>
         </div>
         

@@ -10,8 +10,8 @@
     <header th:insert="~{blocks/header :: header}"></header>
 
     
-<div th:each="person : ${people}">
-    <a th:href="@{/people/{id}(id=${person.getPersonId()})}" th:text="${person.getFullName() + ', ' + person.getAge()}">user</a>
+<div th:each="personUserDTO : ${personUserDTOs}">
+    <a th:href="@{/people/{id}(id=${personUserDTO.getPersonId()})}" th:text="${personUserDTO.getFullName() + ', ' + personUserDTO.getAge()}">user</a>
 </div>
 
 <br/>

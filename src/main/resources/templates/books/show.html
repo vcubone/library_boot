@@ -1,41 +1,60 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>Книга</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
 
 </head>
+
 <body>
     <header th:insert="~{blocks/header :: header}"></header>
 
-    
-    <p th:text="${book.getTitle() + ', ' + book.getAuthor() + ', ' + book.getReleaseYear}">VALUE</p>
-    <p th:text="${book.getBookId()}">VALUE</p>
-    
-    <div th:if="${people}">
-        <span>Эта книга свободна. Кому назначить ее?</span>
-        <form th:method="PATCH" th:action="@{/books/{bookId}/addowner(bookId = ${book.getBookId()})}">
-            <label for="person">Выберете человека:</label>
-            <select th:object="${person}" th:field="*{personId}" id="person">
-                <option th:each="person : ${people}" th:value="${person.getPersonId()}" th:text="${person.getFullName()}"></option>
-            </select>
-            <input type="submit" value="Назначить книгу"/>
+    <p th:text="${bookUsersInfoDTO.getTitle() + ', ' + bookUsersInfoDTO.getAuthor() + ', ' + bookUsersInfoDTO.getReleaseYear}">VALUE</p>
+    <p th:text="${bookUsersInfoDTO.getBookId()}">VALUE</p>
+
+
+    <div th:unless="${owner}"><!--No owner-->
+        <span>Эта книга свободна.</span>
+        <div th:if="${personUserDTOs}"><!--admin-->
+            <span> Кому назначить ее?</span>
+            <form th:method="PATCH" th:action="@{/books/{bookId}/addowner(bookId = ${bookUsersInfoDTO.getBookId()})}">
+                <label for="personUserDTO">Выберете человека:</label>
+                <select th:object="${personUserDTO}" th:field="*{personId}" id="personUserDTO">
+                    <option th:each="personUserDTO : ${personUserDTOs}" th:value="${personUserDTO.getPersonId()}"
+                        th:text="${personUserDTO.getFullName()}"></option>
+                </select>
+                <input type="submit" value="Назначить книгу" />
+            </form>
+        </div>
+        <form sec:authorize="hasRole('USER')" th:method="PATCH" th:action="@{/books/{id}/addowner(id=${bookUsersInfoDTO.getBookId()})}"><!--user-->
+            <input  type="submit" value="Взять книгу" />
         </form>
     </div>
+
+    <!--owner exists-->
     <div th:if="${owner}">
-        <span>Книга сейчас у: </span> <span th:text="${owner.getFullName()}">Person Name</span>
-        <form th:method="PATCH" th:action="@{/books/{id}/release(id=${book.getBookId()})}">
-            <input type="submit" value="Освободить книгу"/>
+        <span>Книга занята </span>
+        <div sec:authorize="hasRole('ADMIN')"><!--admin-->
+            <span>Книга сейчас у: </span> <span th:text="${owner.getFullName()}">Person Name</span>
+            <form th:method="PATCH" th:action="@{/books/{id}/release(id=${bookUsersInfoDTO.getBookId()})}">
+                <input type="submit" value="Освободить книгу" />
+            </form>
+        </div>
+        <form th:if="${UserIsOwner}" th:method="PATCH" th:action="@{/books/{id}/release(id=${bookUsersInfoDTO.getBookId()})}">
+            <!--user is the owner of the book-->
+            <input type="submit" value="Освободить книгу" />
         </form>
     </div>
-    
-    <br/>
-    <a th:href="@{/books/{id}/edit(id=${book.getBookId()})}">Редактировать</a>
-    <form th:method="DELETE" th:action="@{/books/{id}(id=${book.getBookId()})}">
-        <input type="submit" value="Удалить книгу"/>
+
+    <br />
+    <a sec:authorize="hasRole('ADMIN')" th:href="@{/books/{id}/edit(id=${bookUsersInfoDTO.getBookId()})}">Редактировать</a>
+    <form sec:authorize="hasRole('ADMIN')" th:method="DELETE" th:action="@{/books/{id}(id=${bookUsersInfoDTO.getBookId()})}">
+        <input type="submit" value="Удалить книгу" />
     </form>
     <footer th:insert="~{blocks/footer :: footer}"></footer>
 
 </body>
+
 </html>

@@ -11,13 +11,13 @@
 
 
     
-<div th:each="book : ${books}">
-    <a th:href="@{/books/{id}(id=${book.getBookId()})}" th:text="${book.getTitle() + ', ' + book.getAuthor() + ', ' + book.getReleaseYear}">book</a>
+<div th:each="bookUserDTO : ${bookUserDTOs}">
+    <a th:href="@{/books/{id}(id=${bookUserDTO.getBookId()})}" th:text="${bookUserDTO.getTitle() + ', ' + bookUserDTO.getAuthor() + ', ' + bookUserDTO.getReleaseYear}">bookUserDTO</a>
 </div>
 
 <br/>
 <hr/>
-<a th:href="@{/books/new}">Добавить книгу</a>
+<a sec:authorize="hasRole('ADMIN')" th:href="@{/books/new}">Добавить книгу</a>
 
 <footer th:insert="~{blocks/footer :: footer}"></footer>
 

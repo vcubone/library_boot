@@ -3,22 +3,33 @@ package ru.batorov.library.models;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
+import org.hibernate.annotations.DynamicUpdate;
+
 @Entity
+@DynamicUpdate
 public class Person {
     @Id
     @Column(name = "personId")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int personId;
+    private Integer personId;
+    
+    @OneToOne(optional = false, mappedBy = "person", cascade = {CascadeType.REMOVE, CascadeType.PERSIST}, fetch = FetchType.LAZY)
+    @PrimaryKeyJoinColumn
+    private Credentials credentials;
     
     @Column(name = "fullName")
     @NotEmpty(message = "name shouldn't be empty")
@@ -27,7 +38,7 @@ public class Person {
     
     @Column(name = "age")
     @Min(value = 0, message = "Age > 0")
-    private int age;
+    private Integer age;
     
     @OneToMany(mappedBy = "owner")
     private List<Book> books;
@@ -39,45 +50,59 @@ public class Person {
     
     public Person() {
     }
-    public Person(
-            @NotEmpty(message = "name shouldn't be empty") @Size(min = 2, max = 30, message = "Name between 2 and 30") String fullName,
-            @Min(value = 0, message = "Age > 0") int age) {
-        this.fullName = fullName;
-        this.age = age;
-    }
-    public int getPersonId() {
+
+    public Integer getPersonId() {
         return personId;
     }
-    public void setPersonId(int personId) {
+
+    public void setPersonId(Integer personId) {
         this.personId = personId;
     }
+
+    public Credentials getCredentials() {
+        return credentials;
+    }
+
+    public void setCredentials(Credentials credentials) {
+        this.credentials = credentials;
+    }
+
     public String getFullName() {
         return fullName;
     }
+
     public void setFullName(String fullName) {
         this.fullName = fullName;
     }
-    public int getAge() {
+
+    public Integer getAge() {
         return age;
     }
-    public void setAge(int age) {
+
+    public void setAge(Integer age) {
         this.age = age;
     }
+
     public List<Book> getBooks() {
         return books;
     }
+
     public void setBooks(List<Book> books) {
         this.books = books;
     }
+
     public LocalDateTime getCreated_at() {
         return created_at;
     }
+
     public void setCreated_at(LocalDateTime created_at) {
         this.created_at = created_at;
     }
+
     public LocalDateTime getUpdated_at() {
         return updated_at;
     }
+
     public void setUpdated_at(LocalDateTime updated_at) {
         this.updated_at = updated_at;
     }

@@ -9,33 +9,36 @@
 <body>
     <header th:insert="~{blocks/header :: header}"></header>
 
-    <p th:text="${person.getFullName() + ', ' + person.getAge()}">VALUE</p>
-    <p th:text="${person.getPersonId()}">VALUE</p>
+    <p th:text="${personAdminDTO.getFullName() + ', ' + personAdminDTO.getAge()}">VALUE</p>
+    <p th:text="${personAdminDTO.getPersonId()}">VALUE</p>
 
     
-    <div th:unless="${books.isEmpty()}">
+    <div th:unless="${bookAdminDTOs.isEmpty()}">
         <hr/>
         <b>Книги:</b>
         <br/>
-        <table th:each="book : ${books}">
+        <table th:each="bookAdminDTO : ${bookAdminDTOs}">
             <tr>
                 <td>
-                    <span th:text="${book.getTitle() + ', ' + book.getAuthor() + ', ' + book.getReleaseYear()}" th:style="${book.isExpired() ? 'color:red' : ''}">
+                    <span th:text="${bookAdminDTO.getTitle() + ', ' + bookAdminDTO.getAuthor() + ', ' + bookAdminDTO.getReleaseYear()}" th:style="${bookAdminDTO.isExpired() ? 'color:red' : ''}">
                         book
                     </span>
+                    <form th:method="PATCH" th:action="@{/books/{id}/release(id=${bookAdminDTO.getBookId()})}">
+                        <input type="submit" value="Освободить книгу" />
+                    </form>
                 </td>
             </tr>
         </table>
         <hr/>
     </div>
     
-    <div th:if="${books.isEmpty()}">
+    <div th:if="${bookAdminDTOs.isEmpty()}">
         <p>Читатель пока не взял ни одной книги</p>
         <hr/>
     </div>
     
-<a th:href="@{/people/{id}/edit(id=${person.getPersonId()})}">Редактировать</a>
-<form th:method="DELETE" th:action="@{/people/{id}(id=${person.getPersonId()})}">
+<a th:href="@{/people/{id}/edit(id=${personAdminDTO.getPersonId()})}">Редактировать</a>
+<form th:method="DELETE" th:action="@{/people/{id}(id=${personAdminDTO.getPersonId()})}">
     <input type="submit" value="Удалить"/>
 </form>
 

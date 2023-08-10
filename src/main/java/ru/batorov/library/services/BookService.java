@@ -3,6 +3,7 @@ package ru.batorov.library.services;
 import java.util.Date;
 import java.util.List;
 
+import org.hibernate.Hibernate;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.batorov.library.models.Book;
 import ru.batorov.library.models.Person;
 import ru.batorov.library.repositories.BookRepository;
+import ru.batorov.library.util.CopyHelper;
 
 @Service
 @Transactional(readOnly = true)
@@ -49,10 +51,8 @@ public class BookService {
         Book bookToBeUpdated = bookRepository.findById(bookId).orElse(null);
         if (bookToBeUpdated == null)
             return;
-        updatedBook.setOwner(bookToBeUpdated.getOwner());
-        updatedBook.setBookId(bookId);
-        updatedBook.setTakeTime(bookToBeUpdated.getTakeTime());
-        bookRepository.save(updatedBook);
+        CopyHelper.copyNotNullProperties(updatedBook, bookToBeUpdated);
+        bookRepository.save(bookToBeUpdated);
     }
     
     @Transactional
@@ -81,5 +81,15 @@ public class BookService {
     public List<Book> findByTitleStartingWith(String findRequest)
     {
         return bookRepository.findByTitleStartingWith(findRequest);
+    }
+    
+    public Person getPersonByBookId(int bookId)
+    {
+        Book book = show(bookId);
+        if (book != null){
+            Hibernate.initialize(book.getOwner());
+            return book.getOwner();
+        }
+        return null;
     }
 }
