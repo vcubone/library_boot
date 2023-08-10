@@ -23,13 +23,13 @@ import ru.batorov.library.controllers.HomePageController;
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")
-public class LibraryApplicationTests {
+public class UnAuthorizedUserTests {
 	@Autowired
     private MockMvc mvc;
 	@Autowired
 	private HomePageController homePageController;
 	
-	public LibraryApplicationTests() {
+	public UnAuthorizedUserTests() {
 	}
 
 	@Test
