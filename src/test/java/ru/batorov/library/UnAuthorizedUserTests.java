@@ -7,15 +7,18 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import static org.hamcrest.Matchers.containsString;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import ru.batorov.library.controllers.HomePageController;
 
@@ -23,12 +26,13 @@ import ru.batorov.library.controllers.HomePageController;
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")
+@Sql(value = {})
 public class UnAuthorizedUserTests {
 	@Autowired
-    private MockMvc mvc;
+	private MockMvc mvc;
 	@Autowired
 	private HomePageController homePageController;
-	
+
 	public UnAuthorizedUserTests() {
 	}
 
@@ -36,10 +40,76 @@ public class UnAuthorizedUserTests {
 	public void controllerExists() {
 		assertNotNull("no home page controller", homePageController);
 	}
+
+	@Test
+	public void homePage() throws Exception {
+		this.mvc.perform(get("/")).andDo(print()).andExpect(status().isOk())
+				.andExpect(content().string(containsString("Войти в аккаунт")));
+	}
+
+	@Test
+	public void books() throws Exception {
+		this.mvc.perform(get("/books")).andDo(print()).andExpect(status().isOk())
+				.andExpect(content().string(containsString("Войти в аккаунт")));
+	}
+
+	@Test
+	public void booksSearch() throws Exception {
+		this.mvc.perform(get("/books/search")).andDo(print()).andExpect(status().isOk())
+				.andExpect(content().string(containsString("Войти в аккаунт")));
+	}
+
+	@Test
+	public void accesDeniedAccount() throws Exception {
+		this.mvc.perform(get("/account/main")).andDo(print()).andExpect(status().is3xxRedirection())
+				.andExpect(redirectedUrl("http://localhost/auth/login"));
+		this.mvc.perform(get("/account/edit")).andDo(print()).andExpect(status().is3xxRedirection())
+				.andExpect(redirectedUrl("http://localhost/auth/login"));
+		this.mvc.perform(patch("/account/edit")).andDo(print()).andExpect(status().is4xxClientError());
+		this.mvc.perform(get("/credentials/edit")).andDo(print()).andExpect(status().is3xxRedirection())
+				.andExpect(redirectedUrl("http://localhost/auth/login"));
+		this.mvc.perform(patch("/credentials/edit")).andDo(print()).andExpect(status().is4xxClientError());
+	}
+
+	@Test
+	public void accesDeniedPeople() throws Exception {
+		this.mvc.perform(get("/people")).andDo(print()).andExpect(status().is3xxRedirection())
+				.andExpect(redirectedUrl("http://localhost/auth/login"));
+		this.mvc.perform(get("/people/new")).andDo(print()).andExpect(status().is3xxRedirection())
+				.andExpect(redirectedUrl("http://localhost/auth/login"));
+		for (int i = -1; i < 10; i++) {
+			this.mvc.perform(get("/people/" + i)).andDo(print()).andExpect(status().is3xxRedirection())
+					.andExpect(redirectedUrl("http://localhost/auth/login"));
+			this.mvc.perform(get("/people/" + i + "/edit")).andDo(print()).andExpect(status().is3xxRedirection())
+					.andExpect(redirectedUrl("http://localhost/auth/login"));
+			this.mvc.perform(patch("/people/" + i + "/edit")).andDo(print()).andExpect(status().is4xxClientError());
+			this.mvc.perform(get("/people/credentials/" + i + "/edit")).andDo(print())
+					.andExpect(status().is3xxRedirection())
+					.andExpect(redirectedUrl("http://localhost/auth/login"));
+			this.mvc.perform(patch("/people/credentials/" + i + "/edit")).andDo(print())
+					.andExpect(status().is4xxClientError());
+			this.mvc.perform(delete("/people/" + i)).andDo(print()).andExpect(status().is4xxClientError());
+		}
+	}
+	// TODO доделать accesdenied redirect login
 	
 	@Test
-	public void homePageWorking() throws Exception{
-		this.mvc.perform(get("/")).andDo(print()).andExpect(status().isOk())
-				.andExpect(content().string(containsString("\u0414\u043E\u0431\u0440\u043E")));//Добро
+	public void login() throws Exception {
+		this.mvc.perform(get("/auth/login")).andDo(print()).andExpect(status().isOk())
+				.andExpect(content().string(containsString("Введите имя пользователя")));
 	}
+	
+	@Test
+	public void register() throws Exception {
+		this.mvc.perform(get("/auth/register")).andDo(print()).andExpect(status().isOk())
+				.andExpect(content().string(containsString("Введите username")));
+	}
+	
+	//TODO post register check db
+	
+	@Test
+	public void badCredentials() throws Exception {
+		this.mvc.perform(post("/process_login").param("user", "test")).andDo(print()).andExpect(status().isForbidden());
+	}
+
 }
