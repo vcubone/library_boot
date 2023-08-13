@@ -2,15 +2,20 @@ package ru.batorov.library.util;
 
 import org.springframework.security.core.Authentication;
 
-import ru.batorov.library.security.CredentialsDetails;
+import ru.batorov.library.models.Person;
+import ru.batorov.library.security.PersonDetails;
 
 public class AuthenticationHelper {
-	public static int getUserIdByAuthentication(Authentication authentif) {
-		return ((CredentialsDetails) authentif.getPrincipal()).getCredentials().getPersonId();
+	public static int getUserIdByAuthentication(Authentication authentication) {
+		return ((PersonDetails) authentication.getPrincipal()).getPerson().getId();
+	}
+	
+	public static Person getPersonFromAuthentication(Authentication authentication){
+		return ((PersonDetails) authentication.getPrincipal()).getPerson();
 	}
 
-	public static boolean hasRoleByAuthentication(Authentication authentif, String role) {
-		return authentif.getAuthorities().stream()
+	public static boolean hasRoleByAuthentication(Authentication authentication, String role) {
+		return authentication.getAuthorities().stream()
 				.anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(role));
 	}
 }

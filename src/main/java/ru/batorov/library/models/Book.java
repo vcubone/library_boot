@@ -3,7 +3,6 @@ package ru.batorov.library.models;
 import java.time.LocalDateTime;
 import java.util.Date;
 
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -22,39 +21,39 @@ import javax.validation.constraints.Size;
 @Entity
 public class Book {
     @Id
-    @Column(name = "bookId")
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer bookId;
-    
+    private Integer id;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "personId", referencedColumnName = "personId")
+    @JoinColumn(name = "person_id", referencedColumnName = "id")
     private Person owner;
-    
+
     @Column(name = "title")
     @NotEmpty(message = "title shouldn't be empty")
     @Size(min = 2, max = 30, message = "title between 2 and 30")
     private String title;
-    
+
     @Column(name = "author")
     @NotEmpty(message = "author shouldn't be empty")
     @Size(min = 2, max = 30, message = "author between 2 and 30")
     private String author;
-    
+
     @Column(name = "releaseYear")
     @Min(value = 0, message = "release_year > 0")
     private Integer releaseYear;
-    
+
     @Column(name = "takeTime")
     @Temporal(TemporalType.TIMESTAMP)
     private Date takeTime;
 
     @Transient
     private boolean expired;
-    
+
     @Column(name = "created_at")
-	private LocalDateTime created_at;
-	@Column(name = "updated_at")
-	private LocalDateTime updated_at;
+    private LocalDateTime created_at;
+    @Column(name = "updated_at")
+    private LocalDateTime updated_at;
 
     public Book() {
     }
@@ -66,14 +65,6 @@ public class Book {
         this.title = title;
         this.author = author;
         this.releaseYear = releaseYear;
-    }
-
-    public Integer getBookId() {
-        return bookId;
-    }
-
-    public void setBookId(Integer bookId) {
-        this.bookId = bookId;
     }
 
     public Person getOwner() {
@@ -115,7 +106,7 @@ public class Book {
     public void setTakeTime(Date takeTime) {
         this.takeTime = takeTime;
     }
-    
+
     public boolean isExpired() {
         return expired;
     }
@@ -139,5 +130,12 @@ public class Book {
     public void setUpdated_at(LocalDateTime updated_at) {
         this.updated_at = updated_at;
     }
-    
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 }

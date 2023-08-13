@@ -9,7 +9,7 @@ public class CredentialsUserDTO {
     private String username;
     
     @NotEmpty(message = "password shouldn't be empty")
-    @Size(min = 2, max = 70, message = "password between 2 and 70 field")
+    @Size(min = 2, max = 10, message = "password between 2 and 10 field")
     private String password;
 	
 	public String getUsername() {

@@ -1,18 +1,30 @@
 package ru.batorov.library.dto;
 
+import java.util.Collection;
+
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 public class PersonAdminDTO {
-	private Integer personId;
+	private Integer id;
 	
     @NotEmpty(message = "name shouldn't be empty")
     @Size(min = 2, max = 30, message = "Name between 2 and 30")
     private String fullName;
     
-    @Min(value = 0, message = "Age > 0")
-    private Integer age;
+    @Min(value = 0, message = "yearOfBirth > 0")
+    private Integer yearOfBirth;
+
+	Collection<RoleDTO> roles;
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
 	public String getFullName() {
 		return fullName;
@@ -22,19 +34,21 @@ public class PersonAdminDTO {
 		this.fullName = fullName;
 	}
 
-	public Integer getAge() {
-		return age;
+	public Integer getYearOfBirth() {
+		return yearOfBirth;
 	}
 
-	public void setAge(Integer age) {
-		this.age = age;
+	public void setYearOfBirth(Integer yearOfBirth) {
+		this.yearOfBirth = yearOfBirth;
 	}
 
-	public Integer getPersonId() {
-		return personId;
+	public Collection<RoleDTO> getRoles() {
+		return roles;
 	}
 
-	public void setPersonId(Integer personId) {
-		this.personId = personId;
+	public void setRoles(Collection<RoleDTO> roles) {
+		this.roles = roles;
 	}
+	
+	
 }

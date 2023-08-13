@@ -1,7 +1,10 @@
 package ru.batorov.library.models;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collection;
+import java.util.Collection;
+import java.util.Collection;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -10,6 +13,9 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
@@ -23,25 +29,39 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicUpdate
 public class Person {
     @Id
-    @Column(name = "personId")
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer personId;
+    private Integer id;
     
-    @OneToOne(optional = false, mappedBy = "person", cascade = {CascadeType.REMOVE, CascadeType.PERSIST}, fetch = FetchType.LAZY)
-    @PrimaryKeyJoinColumn
-    private Credentials credentials;
+    @Column(name = "username")
+    @NotEmpty(message = "username shouldn't be empty")
+    @Size(min = 2, max = 30, message = "Name between 2 and 30")
+    private String username;
+
+    @Column(name = "password")
+    @NotEmpty(message = "password shouldn't be empty")
+    @Size(min = 2, max = 70, message = "password between 2 and 70 field")
+    private String password;
     
-    @Column(name = "fullName")
+    @ManyToMany
+    @JoinTable(
+        name = "person_role",
+        joinColumns = @JoinColumn(name = "person_id", referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
+    )
+    private Collection<Role> roles;
+
+    @Column(name = "full_name")
     @NotEmpty(message = "name shouldn't be empty")
     @Size(min = 2, max = 30, message = "Name between 2 and 30")
     private String fullName;
     
-    @Column(name = "age")
-    @Min(value = 0, message = "Age > 0")
-    private Integer age;
+    @Column(name = "year_of_birth")
+    @Min(value = 0, message = "yearOfBirth > 0")
+    private Integer yearOfBirth;
     
     @OneToMany(mappedBy = "owner")
-    private List<Book> books;
+    private Collection<Book> books;
     
     @Column(name = "created_at")
 	private LocalDateTime created_at;
@@ -51,20 +71,36 @@ public class Person {
     public Person() {
     }
 
-    public Integer getPersonId() {
-        return personId;
+    public Integer getId() {
+        return id;
     }
 
-    public void setPersonId(Integer personId) {
-        this.personId = personId;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
-    public Credentials getCredentials() {
-        return credentials;
+    public String getUsername() {
+        return username;
     }
 
-    public void setCredentials(Credentials credentials) {
-        this.credentials = credentials;
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Collection<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Collection<Role> roles) {
+        this.roles = roles;
     }
 
     public String getFullName() {
@@ -75,19 +111,19 @@ public class Person {
         this.fullName = fullName;
     }
 
-    public Integer getAge() {
-        return age;
+    public Integer getYearOfBirth() {
+        return yearOfBirth;
     }
 
-    public void setAge(Integer age) {
-        this.age = age;
+    public void setYearOfBirth(Integer yearOfBirth) {
+        this.yearOfBirth = yearOfBirth;
     }
 
-    public List<Book> getBooks() {
+    public Collection<Book> getBooks() {
         return books;
     }
 
-    public void setBooks(List<Book> books) {
+    public void setBooks(Collection<Book> books) {
         this.books = books;
     }
 
@@ -106,5 +142,5 @@ public class Person {
     public void setUpdated_at(LocalDateTime updated_at) {
         this.updated_at = updated_at;
     }
-    
+
 }

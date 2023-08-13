@@ -5,7 +5,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 public class BookAdminDTO {
-	private Integer bookId;
+	private Integer id;
 
 	@NotEmpty(message = "title shouldn't be empty")
 	@Size(min = 2, max = 30, message = "title between 2 and 30")
@@ -17,7 +17,7 @@ public class BookAdminDTO {
 
 	@Min(value = 0, message = "release_year > 0")
 	private Integer releaseYear;
-	
+
 	public Boolean expired;
 
 	public Boolean isExpired() {
@@ -26,14 +26,6 @@ public class BookAdminDTO {
 
 	public void setExpired(Boolean expired) {
 		this.expired = expired;
-	}
-
-	public Integer getBookId() {
-		return bookId;
-	}
-
-	public void setBookId(Integer bookId) {
-		this.bookId = bookId;
 	}
 
 	public String getTitle() {
@@ -58,5 +50,17 @@ public class BookAdminDTO {
 
 	public void setReleaseYear(Integer releaseYear) {
 		this.releaseYear = releaseYear;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public Boolean getExpired() {
+		return expired;
 	}
 }

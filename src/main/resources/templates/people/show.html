@@ -9,8 +9,11 @@
 <body>
     <header th:insert="~{blocks/header :: header}"></header>
 
-    <p th:text="${personAdminDTO.getFullName() + ', ' + personAdminDTO.getAge()}">VALUE</p>
-    <p th:text="${personAdminDTO.getPersonId()}">VALUE</p>
+    <p th:text="${personAdminDTO.getFullName() + ', ' + personAdminDTO.getYearOfBirth()}">VALUE</p>
+    <p th:text="${personAdminDTO.getId()}">VALUE</p>
+    <div th:each="roleDTO : ${personAdminDTO.getRoles()}">
+        <span th:text="${roleDTO.getName()}">role</span>
+    </div>
 
     
     <div th:unless="${bookAdminDTOs.isEmpty()}">
@@ -23,7 +26,7 @@
                     <span th:text="${bookAdminDTO.getTitle() + ', ' + bookAdminDTO.getAuthor() + ', ' + bookAdminDTO.getReleaseYear()}" th:style="${bookAdminDTO.isExpired() ? 'color:red' : ''}">
                         book
                     </span>
-                    <form th:method="PATCH" th:action="@{/books/{id}/release(id=${bookAdminDTO.getBookId()})}">
+                    <form th:method="PATCH" th:action="@{/books/{id}/release(id=${bookAdminDTO.getId()})}">
                         <input type="submit" value="Освободить книгу" />
                     </form>
                 </td>
@@ -37,8 +40,8 @@
         <hr/>
     </div>
     
-<a th:href="@{/people/{id}/edit(id=${personAdminDTO.getPersonId()})}">Редактировать</a>
-<form th:method="DELETE" th:action="@{/people/{id}(id=${personAdminDTO.getPersonId()})}">
+<a th:href="@{/people/{id}/edit(id=${personAdminDTO.getId()})}">Редактировать</a>
+<form th:method="DELETE" th:action="@{/people/{id}(id=${personAdminDTO.getId()})}">
     <input type="submit" value="Удалить"/>
 </form>
 

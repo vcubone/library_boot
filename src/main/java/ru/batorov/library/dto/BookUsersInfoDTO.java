@@ -10,5 +10,4 @@ public class BookUsersInfoDTO extends BookUserDTO{
 	public void setExpired(boolean expired) {
 		this.expired = expired;
 	}
-	
 }

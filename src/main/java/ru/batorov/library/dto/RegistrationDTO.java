@@ -5,52 +5,51 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 public class RegistrationDTO {
-	@NotEmpty(message = "name shouldn't be empty")
+    @NotEmpty(message = "username shouldn't be empty")
     @Size(min = 2, max = 30, message = "Name between 2 and 30")
     private String username;
-    
+
     @NotEmpty(message = "password shouldn't be empty")
-    @Size(min = 2, max = 70, message = "password between 2 and 70 field")
+    @Size(min = 2, max = 10, message = "password between 2 and 10 field")
     private String password;
-	
-	@NotEmpty(message = "name shouldn't be empty")
+
+    @NotEmpty(message = "name shouldn't be empty")
     @Size(min = 2, max = 30, message = "Name between 2 and 30")
     private String fullName;
-    
-    @Min(value = 0, message = "Age > 0")
-    private Integer age;
 
-	public String getUsername() {
-		return username;
-	}
+    @Min(value = 0, message = "yearOfBirth > 0")
+    private Integer yearOfBirth;
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+    public String getUsername() {
+        return username;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public String getFullName() {
-		return fullName;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
-	}
+    public String getFullName() {
+        return fullName;
+    }
 
-	public Integer getAge() {
-		return age;
-	}
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
 
-	public void setAge(Integer age) {
-		this.age = age;
-	}
-	
-	
+    public Integer getYearOfBirth() {
+        return yearOfBirth;
+    }
+
+    public void setYearOfBirth(Integer yearOfBirth) {
+        this.yearOfBirth = yearOfBirth;
+    }
+
 }
