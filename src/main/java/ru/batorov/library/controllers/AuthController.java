@@ -11,23 +11,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import ru.batorov.library.dto.RegistrationDTO;
-import ru.batorov.library.models.Credentials;
 import ru.batorov.library.models.Person;
 import ru.batorov.library.services.PeopleService;
-import ru.batorov.library.util.CredentialsValidator;
-import ru.batorov.library.util.PersonValidator;
+import ru.batorov.library.util.PersonsCredentialsValidator;
 
 @Controller
 @RequestMapping("/auth")
 public class AuthController {
-	private final PersonValidator personValidator;
 	private final PeopleService peopleService;
-	private final CredentialsValidator credentialsValidator;
+	private final PersonsCredentialsValidator credentialsValidator;
 	private final ModelMapper modelMapper;
 
-	public AuthController(PersonValidator personValidator, PeopleService peopleService,
-			CredentialsValidator credentialsValidator, ModelMapper modelMapper) {
-		this.personValidator = personValidator;
+	public AuthController(PeopleService peopleService,
+			PersonsCredentialsValidator credentialsValidator, ModelMapper modelMapper) {
 		this.peopleService = peopleService;
 		this.credentialsValidator = credentialsValidator;
 		this.modelMapper = modelMapper;
@@ -43,20 +39,17 @@ public class AuthController {
 		System.out.println("registrPage");
 		return "auth/register";
 	}
-	
+
 	@PostMapping("/register")
-	public String performRegistration(@ModelAttribute("registrationDTO") @Valid RegistrationDTO registrationDTO, BindingResult bindingResult) {
+	public String performRegistration(@ModelAttribute("registrationDTO") @Valid RegistrationDTO registrationDTO,
+			BindingResult bindingResult) {
 		Person person = modelMapper.map(registrationDTO, Person.class);
-		Credentials credentials = modelMapper.map(registrationDTO, Credentials.class);
-		
-		personValidator.validate(person, bindingResult);
-		credentialsValidator.validate(credentials, bindingResult);
-		
+
+		credentialsValidator.validate(person, bindingResult);
+
 		if (bindingResult.hasErrors())
 			return "/auth/register";
-		credentials.setPerson(person);
-		person.setCredentials(credentials);
-		
+
 		peopleService.register(person);
 		return "redirect:/auth/login";
 	}

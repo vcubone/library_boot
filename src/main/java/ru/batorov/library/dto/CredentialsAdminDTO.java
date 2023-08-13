@@ -4,25 +4,15 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 public class CredentialsAdminDTO {
-	private Integer personId;
+	private Integer id;
 	
 	@NotEmpty(message = "name shouldn't be empty")
     @Size(min = 2, max = 30, message = "Name between 2 and 30")
     private String username;
     
     @NotEmpty(message = "password shouldn't be empty")
-    @Size(min = 2, max = 70, message = "password between 2 and 70 field")
+    @Size(min = 2, max = 10, message = "password between 2 and 10 field")
     private String password;
-	
-	private String role;
-	
-	public String getRole() {
-		return role;
-	}
-
-	public void setRole(String role) {
-		this.role = role;
-	}
 
 	public String getUsername() {
 		return username;
@@ -40,11 +30,11 @@ public class CredentialsAdminDTO {
 		this.password = password;
 	}
 
-	public Integer getPersonId() {
-		return personId;
+	public Integer getId() {
+		return id;
 	}
 
-	public void setPersonId(Integer personId) {
-		this.personId = personId;
+	public void setId(Integer id) {
+		this.id = id;
 	}
 }

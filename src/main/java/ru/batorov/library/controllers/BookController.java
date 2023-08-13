@@ -50,14 +50,14 @@ public class BookController {
         System.out.println("test\n");
         List<Book> books = page == null || itemsPerPage == null ? bookService.all(sortByYear)
                 : bookService.all(sortByYear, page, itemsPerPage);
-        model.addAttribute("bookUserDTOs", convertToBookUserDTOList(books, modelMapper));
+        model.addAttribute("bookUserDTOs", convertToBookUserDTOCollection(books, modelMapper));
         return "books/all";
     }
 
     @GetMapping("/search")
     public String search(Model model, @RequestParam(value = "findRequest", required = false) String findRequest) {
         if (findRequest != null && !findRequest.equals(""))
-            model.addAttribute("bookUserDTOs", convertToBookUserDTOList(bookService.findByTitleStartingWith(findRequest), modelMapper));
+            model.addAttribute("bookUserDTOs", convertToBookUserDTOCollection(bookService.findByTitleStartingWith(findRequest), modelMapper));
         return "books/search";
     }
 
@@ -71,12 +71,12 @@ public class BookController {
             // admin logged in
             if (authentif != null && authentif.isAuthenticated() &&
                     hasRoleByAuthentication(authentif, "ROLE_ADMIN"))
-                model.addAttribute("personUserDTOs", convertToPersonUserDTOList(peopleService.all(), modelMapper));
+                model.addAttribute("personUserDTOs", convertToPersonUserDTOCollection(peopleService.all(), modelMapper));
         } else {
             model.addAttribute("owner", convertToPersonUserDTO(bookService.getPersonByBookId(bookId), modelMapper));
             // user that logged in owns this book
             if (authentif != null && authentif.isAuthenticated() &&
-                    getUserIdByAuthentication(authentif) == book.getOwner().getPersonId())
+                    getUserIdByAuthentication(authentif) == book.getOwner().getId())
                 model.addAttribute("UserIsOwner", true);
         }
         return "books/show";
@@ -89,7 +89,8 @@ public class BookController {
     }
 
     @PostMapping("/new")
-    public String create(@ModelAttribute("book") @Valid Book book, BindingResult bindingResult) {
+    public String create(@ModelAttribute("bookAdminDTO") @Valid BookAdminDTO bookAdminDTO, BindingResult bindingResult) {
+        Book book = converToBook(bookAdminDTO, modelMapper);
         if (bindingResult.hasErrors())
             return "books/new";
         bookService.save(book);
@@ -122,11 +123,11 @@ public class BookController {
     public String addowner(@PathVariable("bookId") int bookId, @ModelAttribute("personUserDTO") PersonUserDTO personUserDTO,
             Authentication authentif) {
         Person person = converToPerson(personUserDTO, modelMapper);
-        if (person.getPersonId() == null) {
+        if (person.getId() == null) {
             if (hasRoleByAuthentication(authentif, "ROLE_ADMIN"))// если админ,значит список людей ему пришел нулевой ->
                                                                  // назначать некому
                 return "redirect:/books/" + bookId;
-            person.setPersonId(getUserIdByAuthentication(authentif));// если юзер, то узнаем его id
+            person.setId(getUserIdByAuthentication(authentif));// если юзер, то узнаем его id
         }
 
         bookService.addOwner(bookId, person);
@@ -139,7 +140,7 @@ public class BookController {
         if (hasRoleByAuthentication(authentif, "ROLE_ADMIN") || // если админ это делает или
                 (hasRoleByAuthentication(authentif, "ROLE_USER") && // юзер с
                         getUserIdByAuthentication(authentif) == bookService
-                                .getPersonByBookId(bookId).getPersonId())// id, совпадающим с владельцем книги
+                                .getPersonByBookId(bookId).getId())// id, совпадающим с владельцем книги
         )
             bookService.deleteOwner(bookId);
         return "redirect:" + request.getHeader("referer");

@@ -11,7 +11,7 @@
 <body>
 	<header th:insert="~{blocks/header :: header}"></header>
 
-	<p th:text="${personUserDTO.getFullName() + ', ' + personUserDTO.getAge()}">VALUE</p>
+	<p th:text="${personUserDTO.getFullName() + ', ' + personUserDTO.getYearOfBirth()}">VALUE</p>
 
 	<div th:unless="${bookUsersInfoDTOs.isEmpty()}">
 		<hr />
@@ -24,7 +24,7 @@
 						th:style="${bookUsersInfoDTO.isExpired() ? 'color:red' : ''}">
 						bookUsersInfoDTO
 					</span>
-					<form th:method="PATCH" th:action="@{/books/{id}/release(id=${bookUsersInfoDTO.getBookId()})}">
+					<form th:method="PATCH" th:action="@{/books/{id}/release(id=${bookUsersInfoDTO.getId()})}">
 						<input type="submit" value="Освободить книгу" />
 					</form>
 				</td>

@@ -1,6 +1,5 @@
 package ru.batorov.library.controllers;
 
-
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,36 +17,40 @@ import javax.validation.Valid;
 import ru.batorov.library.dto.CredentialsAdminDTO;
 import ru.batorov.library.dto.PersonAdminDTO;
 import ru.batorov.library.dto.RegistrationDTO;
-import ru.batorov.library.models.Credentials;
+import ru.batorov.library.dto.RoleDTO;
 import ru.batorov.library.models.Person;
-import ru.batorov.library.services.CredentialsService;
+import ru.batorov.library.models.Role;
 import ru.batorov.library.services.PeopleService;
-import ru.batorov.library.util.CredentialsValidator;
-import ru.batorov.library.util.PersonValidator;
+import ru.batorov.library.services.RolesService;
+import ru.batorov.library.util.PersonsCredentialsValidator;
 
 import static ru.batorov.library.util.DTOConvert.*;
+
+import java.util.Collection;
+import java.util.List;
 
 @Controller
 @RequestMapping("/people")
 public class PeopleController {
-    private final PersonValidator personValidator;
     private final PeopleService peopleService;
     private final ModelMapper modelMapper;
-    private final CredentialsValidator credentialsValidator;
-    private final CredentialsService credentialsService;
+    private final PersonsCredentialsValidator credentialsValidator;
+    private final RolesService rolesService;
 
-    public PeopleController(PersonValidator personValidator, PeopleService peopleService, ModelMapper modelMapper,
-            CredentialsValidator credentialsValidator, CredentialsService credentialsService) {
-        this.personValidator = personValidator;
+    public PeopleController(PeopleService peopleService, ModelMapper modelMapper,
+            PersonsCredentialsValidator credentialsValidator, RolesService rolesService) {
         this.peopleService = peopleService;
         this.modelMapper = modelMapper;
         this.credentialsValidator = credentialsValidator;
-        this.credentialsService = credentialsService;
+        this.rolesService = rolesService;
     }
 
     @GetMapping()
-    public String all(Model model){
-        model.addAttribute("personUserDTOs", convertToPersonUserDTOList(peopleService.all(), modelMapper));
+    public String all(Model model) {
+        List<Person> list = peopleService.allWithRoles();
+        Collection<PersonAdminDTO> listdto = convertToPersonAdminDTOCollection(peopleService.allWithRoles(), modelMapper);
+        //
+        model.addAttribute("personUserDTOs", convertToPersonAdminDTOCollection(peopleService.allWithRoles(), modelMapper));
         return "people/all";
     }
 
@@ -55,69 +58,93 @@ public class PeopleController {
     public String newPerson(@ModelAttribute("registrationDTO") RegistrationDTO registrationDTO) {
         return "people/new";
     }
-    
+
     @PostMapping("/new")
-	public String performRegistration(@ModelAttribute("registrationDTO") @Valid RegistrationDTO registrationDTO, BindingResult bindingResult) {
-		Person person = modelMapper.map(registrationDTO, Person.class);
-		Credentials credentials = modelMapper.map(registrationDTO, Credentials.class);
-		
-		personValidator.validate(person, bindingResult);
-		credentialsValidator.validate(credentials, bindingResult);
-		
-		if (bindingResult.hasErrors())
-			return "/people/new";
-		credentials.setPerson(person);
-		person.setCredentials(credentials);
-		
-		peopleService.register(person);
-		return "redirect:/people";
-	}
-    
+    public String performRegistration(@ModelAttribute("registrationDTO") @Valid RegistrationDTO registrationDTO,
+            BindingResult bindingResult) {
+        Person person = modelMapper.map(registrationDTO, Person.class);
+
+        credentialsValidator.validate(person, bindingResult);
+
+        if (bindingResult.hasErrors())
+            return "/people/new";
+
+        peopleService.register(person);
+        return "redirect:/people";
+    }
+
     @GetMapping("/{id}")
     public String show(@PathVariable("id") int personId, Model model) {
-        model.addAttribute("personAdminDTO", convertToPersonAdminDTO(peopleService.show(personId), modelMapper));
-        model.addAttribute("bookAdminDTOs", convertToBookAdminDTOList(peopleService.getBooksByPersonId(personId), modelMapper));
+        model.addAttribute("personAdminDTO", convertToPersonAdminDTO(peopleService.showWithRoles(personId), modelMapper));
+        model.addAttribute("bookAdminDTOs",
+                convertToBookAdminDTOCollection(peopleService.getBooksByPersonId(personId), modelMapper));
         return "people/show";
     }
-    
+
+    // TODO добавить изменение роли
     @GetMapping("/{personId}/edit")
     public String edit(@PathVariable("personId") int person_id, Model model) {
-        model.addAttribute("personAdminDTO", convertToPersonAdminDTO(peopleService.show(person_id), modelMapper));
+        Person person = peopleService.showWithRoles(person_id);
+        model.addAttribute("personAdminDTO", convertToPersonAdminDTO(person, modelMapper));
+        model.addAttribute("roleDTO", new RoleDTO());
+        
+        List<Role> remainingRoles = rolesService.all();
+        for (Role role : person.getRoles()) {
+            remainingRoles.removeIf(a -> a.getName().equals(role.getName()));
+        }
+        model.addAttribute("allRolesDTO", convertToRoleDTOCollection(remainingRoles, modelMapper));
         return "people/edit";
     }
-    
+
     @PatchMapping("/{personId}/edit")
-    public String update(@ModelAttribute("personAdminDTO") @Valid PersonAdminDTO personAdminDTO, BindingResult bindingResult,@PathVariable("personId") int personId) {
+    public String update(@ModelAttribute("personAdminDTO") @Valid PersonAdminDTO personAdminDTO,
+            BindingResult bindingResult, @PathVariable("personId") int personId) {
         Person person = converToPerson(personAdminDTO, modelMapper);
-        personValidator.validate(person, bindingResult);
         if (bindingResult.hasErrors())
             return "people/edit";
-        
+
         peopleService.update(personId, person);
         return "redirect:/people/" + personId;
     }
     
+    @PatchMapping("/{personId}/edit/deleterole")
+    public String deleteRole(@ModelAttribute("roleDTO") RoleDTO roleDTO, @PathVariable("personId") int personId )
+    {
+        peopleService.deleteRole(personId, convertToRole(roleDTO, modelMapper));
+        return "redirect:/people/" + personId + "/edit";
+    }
+    
+    @PatchMapping("/{personId}/edit/addrole")
+    public String addRole(@ModelAttribute("roleDTO") RoleDTO roleDTO, @PathVariable("personId") int personId )
+    {
+        peopleService.addRole(personId, convertToRole(roleDTO, modelMapper));
+        return "redirect:/people/" + personId + "/edit";
+    }
+
+
     @GetMapping("/{personId}/credentials/edit")
     public String editCredentials(@PathVariable("personId") int person_id, Model model) {
-        model.addAttribute("credentialsAdminDTO", convertToCredentialsAdminDTO(credentialsService.show(person_id), modelMapper));
+        model.addAttribute("credentialsAdminDTO",
+                convertToCredentialsAdminDTO(peopleService.showWithRoles(person_id), modelMapper));
         return "people/credentials/edit";
     }
-    
+
     @PatchMapping("/{personId}/credentials/edit")
-    public String updateCredentials(@ModelAttribute("credentialsAdminDTO") @Valid CredentialsAdminDTO credentialsAdminDTO, BindingResult bindingResult,@PathVariable("personId") int personId) {
-        Credentials credentials = converToCredentials(credentialsAdminDTO, modelMapper);
-        credentialsValidator.validate(credentials, bindingResult);
-        credentials.setPerson(null);//enttities id depends on Person, so it initializes
+    public String updateCredentials(
+            @ModelAttribute("credentialsAdminDTO") @Valid CredentialsAdminDTO credentialsAdminDTO,
+            BindingResult bindingResult, @PathVariable("personId") int personId) {
+        Person person = converToPerson(credentialsAdminDTO, modelMapper);
+        person.setId(personId);
+        credentialsValidator.validate(person, bindingResult);
         if (bindingResult.hasErrors())
             return "people/credentials/edit";
-            
-        credentialsService.update(personId, credentials);
+
+        peopleService.update(personId, person);
         return "redirect:/people/" + personId;
     }
-    
+
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable("id") int id)
-    {
+    public String delete(@PathVariable("id") int id) {
         peopleService.delete(id);
         return "redirect:/people";
     }

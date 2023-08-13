@@ -1,34 +1,34 @@
 package ru.batorov.library.security;
 
 import java.util.Collection;
-import java.util.Collections;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import ru.batorov.library.models.Credentials;
+import ru.batorov.library.models.Person;
 
-public class CredentialsDetails implements UserDetails{
-    final private Credentials credentials;
-    
-    public CredentialsDetails(Credentials credentials) {
-        this.credentials = credentials;
+public class PersonDetails implements UserDetails {
+    final private Person person;
+
+    public PersonDetails(Person person) {
+        this.person = person;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority(credentials.getRole()));
+        return person.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName())).toList();
     }
 
     @Override
     public String getPassword() {
-        return credentials.getPassword();
+        return person.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return credentials.getUsername();
+        return person.getUsername();
     }
 
     @Override
@@ -55,8 +55,8 @@ public class CredentialsDetails implements UserDetails{
         return true;
     }
 
-    //чтобы получать данные аутентифицированного пользователя
-    public Credentials getCredentials() {
-        return this.credentials;
+    // чтобы получать данные аутентифицированного пользователя
+    public Person getPerson() {
+        return this.person;
     }
 }

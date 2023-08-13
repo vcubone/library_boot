@@ -8,21 +8,20 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import ru.batorov.library.services.CredentialsService;
+import ru.batorov.library.services.PeopleService;
 
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter{
-	private final CredentialsService credentialsService;
-	
-	public SecurityConfig(CredentialsService credentialsService) {
-		this.credentialsService = credentialsService;
-	}
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+	private final PeopleService peopleService;
 
+	public SecurityConfig(PeopleService peopleService) {
+		this.peopleService = peopleService;
+	}
 
 	// настраиваем аутентификацию
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(credentialsService).passwordEncoder(getPasswordEncoder());
+		auth.userDetailsService(peopleService).passwordEncoder(getPasswordEncoder());
 	}
 
 	// показывает как шифруются пароли
@@ -30,27 +29,27 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	public PasswordEncoder getPasswordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-	
+
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		// конфигурируем авторизацию
-		//TODO добавить csrf исключение для rest
-        http
-                .authorizeHttpRequests()
-                //.antMatchers("/people/{bookId}{bookId} {bookId}/", "/admin").hasRole("ADMIN")//ïðè hasrole ROLE_ îòáðàñûâàåòñÿ
-                .antMatchers("/books/{bookId}/addowner", "/books/{bookId}/release", "/account/**").hasAnyRole("ADMIN", "USER")
-                .antMatchers("/auth/register", "/auth/login", "/error", "/", "/books", "/books/{bookId}", "/books/search").permitAll()// смотрим какой запрос пришел в приложение и разрешаем туда заходить всем
-                .anyRequest().hasAnyRole("ADMIN")//"USER",
-                .and()// раньше настраивали авторизацию, дальше другой блок
-                .formLogin(login -> login.loginPage("/auth/login")
-                        .loginProcessingUrl("/process_login")//показывает по какому url секьюрити будет ждать данные с формы
-                        // аутентификации, если мы ее сами не делаем
-                        .defaultSuccessUrl("/", true)
-                        .failureUrl("/auth/login?error"))
-                .logout(logout -> logout.logoutUrl("/logout")//удаление сессии на сервере и кукис в браузере
-                        .logoutSuccessUrl("/"))//переход при успехе
-				;
+		// TODO добавить csrf исключение для rest
+		http
+				.authorizeHttpRequests()
+				// .antMatchers("/people/{bookId}{bookId} {bookId}/",
+				// "/admin").hasRole("ADMIN")//ïðè hasrole ROLE_ îòáðàñûâàåòñÿ
+				.antMatchers("/books/{bookId}/addowner", "/books/{bookId}/release", "/account/**").hasRole("USER")
+				.antMatchers("/auth/register", "/auth/login", "/error", "/", "/books", "/books/{bookId}","/books/search").permitAll()// смотрим какой запрос пришел в приложение и разрешаем туда заходить всем
+				.anyRequest().hasAnyRole("ADMIN")
+				.and()// раньше настраивали авторизацию, дальше другой блок
+				.formLogin(login -> login.loginPage("/auth/login")
+						.loginProcessingUrl("/process_login")// показывает по какому url секьюрити будет ждать данные с
+																// формы
+						// аутентификации, если мы ее сами не делаем
+						.defaultSuccessUrl("/", true)
+						.failureUrl("/auth/login?error"))
+				.logout(logout -> logout.logoutUrl("/logout")// удаление сессии на сервере и кукис в браузере
+						.logoutSuccessUrl("/"))// переход при успехе
+		;
 	}
 }
-
- 

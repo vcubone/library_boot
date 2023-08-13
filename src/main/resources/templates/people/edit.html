@@ -8,19 +8,37 @@
 </head>
 <body>
     <header th:insert="~{blocks/header :: header}"></header>
-    <form th:method="PATCH" th:action="@{/people/{id}/edit(id=${personAdminDTO.getPersonId()})}" th:object="${personAdminDTO}">
+    <form th:method="PATCH" th:action="@{/people/{id}/edit(id=${personAdminDTO.getId()})}" th:object="${personAdminDTO}">
         <label for="fullName">Введите ФИО: </label>
         <input type="text" th:field="*{fullName}" id="fullName"/>
         <div style="color:red" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}">Full Name Error</div>
         <br/>
-        <label for="age">Введите год рождения: </label>
-        <input type="text" th:field="*{age}" id="age"/>
-        <div style="color:red" th:if="${#fields.hasErrors('age')}" th:errors="*{age}">Age Error</div>
+        <label for="yearOfBirth">Введите год рождения: </label>
+        <input type="text" th:field="*{yearOfBirth}" id="yearOfBirth"/>
+        <div style="color:red" th:if="${#fields.hasErrors('yearOfBirth')}" th:errors="*{yearOfBirth}">yearOfBirth Error</div>
         <br/>
         <input type="submit" value="Редактировать!"/>
     </form>
-    <a th:href="@{/people/{id}/credentials/edit(id=${personAdminDTO.getPersonId()})}">Редактировать учетные данные</a>
+    <a th:href="@{/people/{id}/credentials/edit(id=${personAdminDTO.getId()})}">Редактировать учетные данные</a>
+    
+    <form th:method="PATCH" th:action="@{/people/{id}/edit/deleterole(id=${personAdminDTO.getId()})}">
+        <label for="addRole">Удалить роль:</label>
+        <select th:object="${roleDTO}" th:field="*{name}" id="addRole">
+            <option th:each="roleDTO : ${personAdminDTO.getRoles()}" th:value="${roleDTO.getName()}" th:text="${roleDTO.getName()}">
+            </option>
+        </select>
+        <input type="submit" value="Удалить" />
+    </form>
+    <form th:method="PATCH" th:action="@{/people/{id}/edit/addrole(id=${personAdminDTO.getId()})}">
+        <label for="addRole">Добавить роль:</label>
+        <select th:object="${roleDTO}" th:field="*{name}" id="addRole">
+            <option th:each="roleDTO : ${allRolesDTO}" th:value="${roleDTO.getName()}"
+                th:text="${roleDTO.getName()}"></option>
+        </select>
+        <input type="submit" value="Добавить" />
+    </form>
+    
+    
     <footer th:insert="~{blocks/footer :: footer}"></footer>
-
 </body>
 </html>
