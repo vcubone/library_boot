@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -26,7 +27,8 @@ import ru.batorov.library.controllers.HomePageController;
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")
-@Sql(value = {})
+@Sql(value = { "/create-books-before.sql" }, executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(value = { "/create-books-after.sql" }, executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 public class UnAuthorizedUserTests {
 	@Autowired
 	private MockMvc mvc;
@@ -44,19 +46,24 @@ public class UnAuthorizedUserTests {
 	@Test
 	public void homePage() throws Exception {
 		this.mvc.perform(get("/")).andDo(print()).andExpect(status().isOk())
-				.andExpect(content().string(containsString("Войти в аккаунт")));
+				.andExpect(xpath("/html/body/header[1]/div/div/header/ul/li[3]/a").string("Войти в аккаунт"));
 	}
 
 	@Test
 	public void books() throws Exception {
 		this.mvc.perform(get("/books")).andDo(print()).andExpect(status().isOk())
-				.andExpect(content().string(containsString("Войти в аккаунт")));
+				.andExpect(xpath("/html/body/header[1]/div/div/header/ul/li[3]/a").string("Войти в аккаунт"))
+				.andExpect(xpath("//*[@id=\"books-list\"]/div").nodeCount(3));
+
+		this.mvc.perform(get("/books?sortByYear=true&page=0&itemsPerPage=2")).andDo(print()).andExpect(status().isOk())
+				.andExpect(xpath("/html/body/header[1]/div/div/header/ul/li[3]/a").string("Войти в аккаунт"))
+				.andExpect(xpath("//*[@id=\"books-list\"]/div").nodeCount(2));
 	}
 
 	@Test
 	public void booksSearch() throws Exception {
 		this.mvc.perform(get("/books/search")).andDo(print()).andExpect(status().isOk())
-				.andExpect(content().string(containsString("Войти в аккаунт")));
+				.andExpect(xpath("/html/body/header[1]/div/div/header/ul/li[3]/a").string("Войти в аккаунт"));
 	}
 
 	@Test
@@ -91,22 +98,22 @@ public class UnAuthorizedUserTests {
 			this.mvc.perform(delete("/people/" + i)).andDo(print()).andExpect(status().is4xxClientError());
 		}
 	}
-	// TODO доделать accesdenied redirect login
-	
+	// TODO доделать acces denied redirect login
+
 	@Test
 	public void login() throws Exception {
 		this.mvc.perform(get("/auth/login")).andDo(print()).andExpect(status().isOk())
 				.andExpect(content().string(containsString("Введите имя пользователя")));
 	}
-	
+
 	@Test
 	public void register() throws Exception {
 		this.mvc.perform(get("/auth/register")).andDo(print()).andExpect(status().isOk())
 				.andExpect(content().string(containsString("Введите username")));
 	}
-	
-	//TODO post register check db
-	
+
+	// TODO post register check db
+
 	@Test
 	public void badCredentials() throws Exception {
 		this.mvc.perform(post("/process_login").param("user", "test")).andDo(print()).andExpect(status().isForbidden());
