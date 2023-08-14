@@ -26,7 +26,6 @@ import ru.batorov.library.util.PersonsCredentialsValidator;
 
 import static ru.batorov.library.util.DTOConvert.*;
 
-import java.util.Collection;
 import java.util.List;
 
 @Controller
@@ -47,9 +46,6 @@ public class PeopleController {
 
     @GetMapping()
     public String all(Model model) {
-        List<Person> list = peopleService.allWithRoles();
-        Collection<PersonAdminDTO> listdto = convertToPersonAdminDTOCollection(peopleService.allWithRoles(), modelMapper);
-        //
         model.addAttribute("personUserDTOs", convertToPersonAdminDTOCollection(peopleService.allWithRoles(), modelMapper));
         return "people/all";
     }
@@ -81,7 +77,6 @@ public class PeopleController {
         return "people/show";
     }
 
-    // TODO добавить изменение роли
     @GetMapping("/{personId}/edit")
     public String edit(@PathVariable("personId") int person_id, Model model) {
         Person person = peopleService.showWithRoles(person_id);

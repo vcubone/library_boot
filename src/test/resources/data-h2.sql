@@ -5,4 +5,4 @@ INSERT INTO `person`(`full_name`, `year_of_birth`, `username`, `password`) VALUE
 
 INSERT INTO `person_role`(`person_id`, `role_id`) VALUES ('1','10');
 
-INSERT INTO `book`(`title`, `author`, `releaseYear`) VALUES ('title','author', 500);
+INSERT INTO `book`(`title`, `author`, `release_year`) VALUES ('title','author', 500);

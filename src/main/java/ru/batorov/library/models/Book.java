@@ -39,7 +39,7 @@ public class Book {
     @Size(min = 2, max = 30, message = "author between 2 and 30")
     private String author;
 
-    @Column(name = "releaseYear")
+    @Column(name = "release_year")
     @Min(value = 0, message = "release_year > 0")
     private Integer releaseYear;
 

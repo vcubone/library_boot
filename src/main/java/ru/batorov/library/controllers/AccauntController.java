@@ -1,7 +1,6 @@
 package ru.batorov.library.controllers;
 
 import static ru.batorov.library.util.AuthenticationHelper.getUserIdByAuthentication;
-import static ru.batorov.library.util.AuthenticationHelper.getPersonFromAuthentication;
 
 import java.util.Collection;
 

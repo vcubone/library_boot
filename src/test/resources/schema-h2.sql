@@ -21,7 +21,7 @@ create table IF NOT EXISTS book(
     person_id int, FOREIGN KEY(person_id) REFERENCES person(id) on DELETE set null,
     title varchar(100) not null,
     author varchar(100) not null,
-    releaseYear int not null,
+    release_year int not null,
 	takeTime timestamp DEFAULT CURRENT_TIMESTAMP,
     created_at timestamp not null DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP	
