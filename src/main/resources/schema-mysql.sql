@@ -22,7 +22,7 @@ create table IF NOT EXISTS book(
     title varchar(100) not null,
     author varchar(100) not null,
     release_year int not null,
-	takeTime timestamp DEFAULT CURRENT_TIMESTAMP,
+	take_time timestamp DEFAULT CURRENT_TIMESTAMP,
     created_at timestamp not null DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP	
 );

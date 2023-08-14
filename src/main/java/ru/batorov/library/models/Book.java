@@ -43,7 +43,7 @@ public class Book {
     @Min(value = 0, message = "release_year > 0")
     private Integer releaseYear;
 
-    @Column(name = "takeTime")
+    @Column(name = "take_time")
     @Temporal(TemporalType.TIMESTAMP)
     private Date takeTime;
 
