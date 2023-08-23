@@ -4,7 +4,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-public class BookAdminDTO {
+public class BookAdminDTO {//TODO change dto system(duplicate fields, Inheritance, composition)
 	private Integer id;
 
 	@NotEmpty(message = "title shouldn't be empty")

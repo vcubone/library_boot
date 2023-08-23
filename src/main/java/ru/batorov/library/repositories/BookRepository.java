@@ -8,5 +8,5 @@ import ru.batorov.library.models.Book;
 
 
 public interface BookRepository extends JpaRepository<Book, Integer>{
-    List<Book> findByTitleStartingWith(String findRequest);
+    List<Book> findByTitleContaining(String findRequest);
 }

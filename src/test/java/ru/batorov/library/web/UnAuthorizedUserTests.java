@@ -1,4 +1,4 @@
-package ru.batorov.library;
+package ru.batorov.library.web;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -12,12 +12,13 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+
+import ru.batorov.library.controllers.web.HomePageController;
+
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import ru.batorov.library.controllers.HomePageController;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

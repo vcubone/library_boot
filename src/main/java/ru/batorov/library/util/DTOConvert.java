@@ -5,12 +5,17 @@ import java.util.Collection;
 import org.modelmapper.ModelMapper;
 
 import ru.batorov.library.dto.BookAdminDTO;
+import ru.batorov.library.dto.BookOwnerDTO;
 import ru.batorov.library.dto.BookUserDTO;
 import ru.batorov.library.dto.BookUsersInfoDTO;
 import ru.batorov.library.dto.CredentialsAdminDTO;
 import ru.batorov.library.dto.CredentialsUserDTO;
 import ru.batorov.library.dto.PersonAdminDTO;
+import ru.batorov.library.dto.PersonWithBooksUserDTO;
 import ru.batorov.library.dto.PersonUserDTO;
+import ru.batorov.library.dto.PersonUserRestDTO;
+import ru.batorov.library.dto.PersonWithBooksAdminDTO;
+import ru.batorov.library.dto.RegistrationDTO;
 import ru.batorov.library.dto.RoleDTO;
 import ru.batorov.library.models.Book;
 import ru.batorov.library.models.Person;
@@ -21,6 +26,14 @@ public class DTOConvert {
 		throw new AssertionError();
 	}
 
+	public static Person converToPerson(PersonUserRestDTO personUserRestDTO, ModelMapper modelMapper) {
+		return modelMapper.map(personUserRestDTO, Person.class);
+	}
+	
+	public static Person converToPerson(RegistrationDTO registrationDTO, ModelMapper modelMapper) {
+		return modelMapper.map(registrationDTO, Person.class);
+	}
+	
 	public static Person converToPerson(PersonUserDTO personDTO, ModelMapper modelMapper) {
 		return modelMapper.map(personDTO, Person.class);
 	}
@@ -32,9 +45,17 @@ public class DTOConvert {
 	public static PersonUserDTO convertToPersonUserDTO(Person person, ModelMapper modelMapper) {
 		return modelMapper.map(person, PersonUserDTO.class);
 	}
+	
+	public static PersonWithBooksUserDTO convertToPersonWithBooksUserDTO(Person person, ModelMapper modelMapper) {
+		return modelMapper.map(person, PersonWithBooksUserDTO.class);
+	}
 
 	public static PersonAdminDTO convertToPersonAdminDTO(Person person, ModelMapper modelMapper) {
 		return modelMapper.map(person, PersonAdminDTO.class);
+	}
+	
+	public static PersonWithBooksAdminDTO convertToPersonWithBooksAdminDTO(Person person, ModelMapper modelMapper) {
+		return modelMapper.map(person, PersonWithBooksAdminDTO.class);
 	}
 
 	public static Collection<PersonUserDTO> convertToPersonUserDTOCollection(Collection<Person> persons,
@@ -87,6 +108,10 @@ public class DTOConvert {
 
 	public static BookUsersInfoDTO convertToBookUsersInfoDTO(Book book, ModelMapper modelMapper) {
 		return modelMapper.map(book, BookUsersInfoDTO.class);
+	}
+	
+	public static BookOwnerDTO convertToBookOwnerDTO(Book book, ModelMapper modelMapper) {
+		return modelMapper.map(book, BookOwnerDTO.class);
 	}
 
 	public static BookAdminDTO convertToBookAdminDTO(Book book, ModelMapper modelMapper) {

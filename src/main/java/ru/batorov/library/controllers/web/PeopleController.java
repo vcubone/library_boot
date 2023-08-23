@@ -1,4 +1,4 @@
-package ru.batorov.library.controllers;
+package ru.batorov.library.controllers.web;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Controller;

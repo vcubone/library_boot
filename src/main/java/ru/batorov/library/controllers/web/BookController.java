@@ -1,4 +1,4 @@
-package ru.batorov.library.controllers;
+package ru.batorov.library.controllers.web;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.Authentication;
@@ -57,7 +57,7 @@ public class BookController {
     @GetMapping("/search")
     public String search(Model model, @RequestParam(value = "findRequest", required = false) String findRequest) {
         if (findRequest != null && !findRequest.equals(""))
-            model.addAttribute("bookUserDTOs", convertToBookUserDTOCollection(bookService.findByTitleStartingWith(findRequest), modelMapper));
+            model.addAttribute("bookUserDTOs", convertToBookUserDTOCollection(bookService.getTitleContaining(findRequest), modelMapper));
         return "books/search";
     }
 

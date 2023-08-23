@@ -56,6 +56,8 @@ public class PeopleService implements UserDetailsService {
             Hibernate.initialize(person.getRoles());
         return person;
     }
+    
+    
 
     @Transactional
     public void save(Person person){
@@ -123,7 +125,7 @@ public class PeopleService implements UserDetailsService {
         if (person != null && !roleToDelete.getName().equals("ROLE_USER")) {
             if (person.getRoles() == null)
                 return;
-            person.getRoles().removeIf(role -> role.getName().equals(roleToDelete.getName()));
+            person.getRoles().remove(roleToDelete);
             save(person);
         }
     }

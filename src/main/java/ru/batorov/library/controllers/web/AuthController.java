@@ -1,4 +1,4 @@
-package ru.batorov.library.controllers;
+package ru.batorov.library.controllers.web;
 
 import javax.validation.Valid;
 
@@ -19,13 +19,13 @@ import ru.batorov.library.util.PersonsCredentialsValidator;
 @RequestMapping("/auth")
 public class AuthController {
 	private final PeopleService peopleService;
-	private final PersonsCredentialsValidator credentialsValidator;
+	private final PersonsCredentialsValidator personCredentialsValidator;
 	private final ModelMapper modelMapper;
 
 	public AuthController(PeopleService peopleService,
 			PersonsCredentialsValidator credentialsValidator, ModelMapper modelMapper) {
 		this.peopleService = peopleService;
-		this.credentialsValidator = credentialsValidator;
+		this.personCredentialsValidator = credentialsValidator;
 		this.modelMapper = modelMapper;
 	}
 
@@ -45,7 +45,7 @@ public class AuthController {
 			BindingResult bindingResult) {
 		Person person = modelMapper.map(registrationDTO, Person.class);
 
-		credentialsValidator.validate(person, bindingResult);
+		personCredentialsValidator.validate(person, bindingResult);
 
 		if (bindingResult.hasErrors())
 			return "/auth/register";

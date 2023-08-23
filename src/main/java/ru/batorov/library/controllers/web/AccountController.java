@@ -1,4 +1,4 @@
-package ru.batorov.library.controllers;
+package ru.batorov.library.controllers.web;
 
 import static ru.batorov.library.util.AuthenticationHelper.getUserIdByAuthentication;
 
@@ -28,12 +28,12 @@ import static ru.batorov.library.util.DTOConvert.*;
 
 @Controller
 @RequestMapping("/account")
-public class AccauntController {
+public class AccountController {
 	private final PeopleService peopleService;
 	private final PersonsCredentialsValidator credentialsValidator;
 	private final ModelMapper modelMapper;
 
-	public AccauntController(PeopleService peopleService, PersonsCredentialsValidator credentialsValidator,
+	public AccountController(PeopleService peopleService, PersonsCredentialsValidator credentialsValidator,
 			ModelMapper modelMapper) {
 		this.peopleService = peopleService;
 		this.credentialsValidator = credentialsValidator;

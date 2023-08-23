@@ -78,9 +78,9 @@ public class BookService {
         );
     }
     
-    public List<Book> findByTitleStartingWith(String findRequest)
+    public List<Book> getTitleContaining(String findRequest)
     {
-        return bookRepository.findByTitleStartingWith(findRequest);
+        return bookRepository.findByTitleContaining(findRequest);
     }
     
     public Person getPersonByBookId(int bookId)

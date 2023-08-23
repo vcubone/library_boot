@@ -1,17 +1,57 @@
 package ru.batorov.library.config;
 
+import java.util.stream.Stream;
+
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import ru.batorov.library.security.jwt.JwtConfigurer;
+import ru.batorov.library.security.jwt.JwtProvider;
 import ru.batorov.library.services.PeopleService;
 
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+	private static final String[] SWAGGER_WHITELIST = {
+			// -- Swagger UI v2
+			"/v2/api-docs",
+			"/swagger-resources",
+			"/swagger-resources/**",
+			"/configuration/ui",
+			"/configuration/security",
+			"/swagger-ui.html",
+			"/webjars/**",
+			// -- Swagger UI v3 (OpenAPI)
+			"/v3/api-docs/**",
+			"/swagger-ui/**"
+	};
+	private static final String[] USER_WHITELIST = {
+			"/books/{bookId}/addowner",
+			"/books/{bookId}/release",
+			"/account/**"
+	};
+	private static final String[] ALL_WHITELIST = {
+			"/auth/register",
+			"/auth/login",
+			"/error",
+			"/",
+			"/books",
+			"/books/{bookId}",
+			"/books/search"
+	};
+	private static final String[] ALL_API_WHITELIST = Stream.of(ALL_WHITELIST).map(str -> "/api" + str)
+			.toArray(String[]::new);
+	private static final String[] USER_API_WHITELIST = Stream.of(USER_WHITELIST).map(str -> "/api" + str)
+			.toArray(String[]::new);
+
 	private final PeopleService peopleService;
 
 	public SecurityConfig(PeopleService peopleService) {
@@ -30,26 +70,55 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		return new BCryptPasswordEncoder();
 	}
 
+	@Bean
 	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		// конфигурируем авторизацию
-		// TODO добавить csrf исключение для rest
-		http
-				.authorizeHttpRequests()
-				// .antMatchers("/people/{bookId}{bookId} {bookId}/",
-				// "/admin").hasRole("ADMIN")//ïðè hasrole ROLE_ îòáðàñûâàåòñÿ
-				.antMatchers("/books/{bookId}/addowner", "/books/{bookId}/release", "/account/**").hasRole("USER")
-				.antMatchers("/auth/register", "/auth/login", "/error", "/", "/books", "/books/{bookId}","/books/search").permitAll()// смотрим какой запрос пришел в приложение и разрешаем туда заходить всем
-				.anyRequest().hasAnyRole("ADMIN")
-				.and()// раньше настраивали авторизацию, дальше другой блок
-				.formLogin(login -> login.loginPage("/auth/login")
-						.loginProcessingUrl("/process_login")// показывает по какому url секьюрити будет ждать данные с
-																// формы
-						// аутентификации, если мы ее сами не делаем
-						.defaultSuccessUrl("/", true)
-						.failureUrl("/auth/login?error"))
-				.logout(logout -> logout.logoutUrl("/logout")// удаление сессии на сервере и кукис в браузере
-						.logoutSuccessUrl("/"))// переход при успехе
-		;
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
+	}
+
+	@Configuration
+	@Order(1)
+	public class ApiSecurityAdapter extends WebSecurityConfigurerAdapter {
+		private JwtProvider jwtProvider;
+
+		public ApiSecurityAdapter(JwtProvider jwtProvider) {
+			this.jwtProvider = jwtProvider;
+		}
+
+		@Override
+		protected void configure(HttpSecurity http) throws Exception {
+			http
+					.csrf(csrf -> csrf.disable())
+					.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+					.antMatcher("/api/**") // <= Security only available for /api/**
+					.authorizeHttpRequests()
+					.antMatchers(ALL_API_WHITELIST).permitAll()
+					.antMatchers(USER_API_WHITELIST).hasRole("USER")
+					.anyRequest().hasAnyRole("ADMIN")
+					.and()
+					.apply(new JwtConfigurer(jwtProvider, peopleService));
+		}
+	}
+
+	@Configuration
+	@Order(2)
+	public class WebSecurityAdapter extends WebSecurityConfigurerAdapter {
+		@Override
+		protected void configure(HttpSecurity http) throws Exception {
+			Stream.of(USER_WHITELIST);
+			http
+					.authorizeHttpRequests()
+					.antMatchers(SWAGGER_WHITELIST).permitAll()
+					.antMatchers(ALL_WHITELIST).permitAll()
+					.antMatchers(USER_WHITELIST).hasRole("USER")
+					.anyRequest().hasAnyRole("ADMIN")
+					.and()
+					.formLogin(login -> login.loginPage("/auth/login")
+							.loginProcessingUrl("/process_login")
+							.defaultSuccessUrl("/", true)
+							.failureUrl("/auth/login?error"))
+					.logout(logout -> logout.logoutUrl("/logout")
+							.logoutSuccessUrl("/"));
+		}
 	}
 }
