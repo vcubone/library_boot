@@ -3,14 +3,15 @@
 Application to demonstrate various parts of a service oriented SpringBoot application.
 
 ### Technology Stack
-Component         | Technology
----               | ---
-Frontend          | HTML
-Backend (REST)    | [SpringBoot](https://projects.spring.io/spring-boot) (Java)
-Security          | Session Based (Spring Security)
-DB                | MySQL
-Persistence       | JPA (Using Spring Data)
-Server Build Tools| Maven(Java) or Gradle
+Component           | Technology
+---                 | ---
+Frontend            | HTML
+Backend (WEB & REST)| [SpringBoot](https://projects.spring.io/spring-boot) (Java)
+Security            | Session Based (Spring Security)
+DB                  | MySQL
+Persistence         | JPA (Using Spring Data)
+Server Build Tools  | Maven(Java) or Gradle
+Documentation tools | Swagger
 
 ## Folder Structure
 ```bash
@@ -110,7 +111,11 @@ docker-compose up
 Cpmponent         | URL
 ---               | ---
 Frontend          |  http://localhost:8080
+Swagger           |  http://localhost:8080/swagger-ui/
 ### Screenshots
+#### Swagger
+![Dashboard](/screenshots/swagger.png?raw=true)
+---
 #### Login
 ![Dashboard](/screenshots/login.png?raw=true)
 ---
@@ -168,6 +173,3 @@ Admin
 Logged in user
 ![Dashboard](/screenshots/account/account_main.png?raw=true)
 ---
-### Planned features
-* Rest API (JWT)
-* Swagger
