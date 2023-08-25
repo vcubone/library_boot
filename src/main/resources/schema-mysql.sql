@@ -26,3 +26,12 @@ create table IF NOT EXISTS book(
     created_at timestamp not null DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP	
 );
+CREATE TABLE IF NOT EXISTS jwtblacklist(
+    name varchar(50) NOT NULL, PRIMARY KEY(name),
+    created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE EVENT IF NOT EXISTS `CleanJwtBlackList`
+    ON SCHEDULE
+      EVERY 6 HOUR
+    DO
+      DELETE FROM `jwtblacklist` WHERE created_at < DATE_ADD(NOW(), INTERVAL -1 HOUR);

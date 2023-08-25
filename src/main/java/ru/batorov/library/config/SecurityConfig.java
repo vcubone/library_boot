@@ -20,6 +20,7 @@ import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 import ru.batorov.library.security.jwt.JwtConfigurer;
 import ru.batorov.library.security.jwt.JwtProvider;
+import ru.batorov.library.services.JwtBlackListService;
 import ru.batorov.library.services.PeopleService;
 
 @EnableWebSecurity
@@ -57,9 +58,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.toArray(String[]::new);
 
 	private final PeopleService peopleService;
+	private final JwtBlackListService jwtBlackListService;
 
-	public SecurityConfig(PeopleService peopleService) {
+	public SecurityConfig(PeopleService peopleService, JwtBlackListService jwtBlackListService) {
 		this.peopleService = peopleService;
+		this.jwtBlackListService = jwtBlackListService;
 	}
 
 	// настраиваем аутентификацию
@@ -89,7 +92,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 					.antMatchers(USER_API_WHITELIST).hasRole("USER")
 					.anyRequest().hasAnyRole("ADMIN")
 					.and()
-					.apply(new JwtConfigurer(jwtProvider, peopleService));
+					.apply(new JwtConfigurer(jwtProvider, peopleService, jwtBlackListService));
 		}
 	}
 
