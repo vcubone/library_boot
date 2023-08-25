@@ -122,7 +122,7 @@ public class PeopleRestController {
     
     @Operation(summary = "Adds role to user", tags = "People", security = @SecurityRequirement(name = "Bearer Authentication"))
     @PatchMapping("/{personId}/edit/addrole")
-    public ResponseEntity<HttpStatus> addRole(@RequestBody RoleDTO roleDTO, @PathVariable("personId") int personId )
+    public ResponseEntity<HttpStatus> addRole(@RequestBody RoleDTO roleDTO, @PathVariable("personId") int personId)
     {
         peopleService.addRole(personId, convertToRole(roleDTO, modelMapper));
         return ResponseEntity.ok(HttpStatus.OK);

@@ -22,6 +22,7 @@ import ru.batorov.library.models.Person;
 import ru.batorov.library.models.Role;
 import ru.batorov.library.services.PeopleService;
 import ru.batorov.library.services.RolesService;
+import ru.batorov.library.services.SessionService;
 import ru.batorov.library.util.PersonsCredentialsValidator;
 
 import static ru.batorov.library.util.DTOConvert.*;
@@ -35,13 +36,16 @@ public class PeopleController {
     private final ModelMapper modelMapper;
     private final PersonsCredentialsValidator credentialsValidator;
     private final RolesService rolesService;
+    private final SessionService sessionService;
 
     public PeopleController(PeopleService peopleService, ModelMapper modelMapper,
-            PersonsCredentialsValidator credentialsValidator, RolesService rolesService) {
+            PersonsCredentialsValidator credentialsValidator, RolesService rolesService,
+            SessionService sessionService) {
         this.peopleService = peopleService;
         this.modelMapper = modelMapper;
         this.credentialsValidator = credentialsValidator;
         this.rolesService = rolesService;
+        this.sessionService = sessionService;
     }
 
     @GetMapping()
@@ -106,6 +110,7 @@ public class PeopleController {
     public String deleteRole(@ModelAttribute("roleDTO") RoleDTO roleDTO, @PathVariable("personId") int personId )
     {
         peopleService.deleteRole(personId, convertToRole(roleDTO, modelMapper));
+        sessionService.expireUserSessions(personId);
         return "redirect:/people/" + personId + "/edit";
     }
     
@@ -113,6 +118,7 @@ public class PeopleController {
     public String addRole(@ModelAttribute("roleDTO") RoleDTO roleDTO, @PathVariable("personId") int personId )
     {
         peopleService.addRole(personId, convertToRole(roleDTO, modelMapper));
+        sessionService.expireUserSessions(personId);
         return "redirect:/people/" + personId + "/edit";
     }
 

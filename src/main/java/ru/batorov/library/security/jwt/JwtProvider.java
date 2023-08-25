@@ -16,9 +16,10 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 public class JwtProvider {
 	@Value("${jwt_secret}") // внедряем из файля
 	private String secret;
+	private final int ttl = 60;
 
 	public String generateToken(String username) {
-		Date expirationDate = Date.from(ZonedDateTime.now().plusMinutes(60).toInstant());
+		Date expirationDate = Date.from(ZonedDateTime.now().plusMinutes(ttl).toInstant());
 		return JWT.create()
 				.withSubject("User details")// обозначает что вообще хранится в jwt
 				.withClaim("username", username)// добавления пары ключ-значение
