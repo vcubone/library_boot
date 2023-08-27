@@ -1,4 +1,4 @@
-package ru.batorov.library.dto;
+package ru.batorov.library.dto.person;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;

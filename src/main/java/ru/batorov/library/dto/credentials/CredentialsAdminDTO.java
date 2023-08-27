@@ -1,17 +1,19 @@
-package ru.batorov.library.dto;
+package ru.batorov.library.dto.credentials;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-public class CredentialsUserDTO {
-    @NotEmpty(message = "name shouldn't be empty")
+public class CredentialsAdminDTO {
+	private Integer id;
+	
+	@NotEmpty(message = "name shouldn't be empty")
     @Size(min = 2, max = 30, message = "Name between 2 and 30")
     private String username;
     
     @NotEmpty(message = "password shouldn't be empty")
     @Size(min = 2, max = 10, message = "password between 2 and 10 field")
     private String password;
-	
+
 	public String getUsername() {
 		return username;
 	}
@@ -26,5 +28,13 @@ public class CredentialsUserDTO {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
 	}
 }

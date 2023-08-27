@@ -4,19 +4,20 @@ import java.util.Collection;
 
 import org.modelmapper.ModelMapper;
 
-import ru.batorov.library.dto.BookAdminDTO;
-import ru.batorov.library.dto.BookOwnerDTO;
-import ru.batorov.library.dto.BookUserDTO;
-import ru.batorov.library.dto.BookUsersInfoDTO;
-import ru.batorov.library.dto.CredentialsAdminDTO;
-import ru.batorov.library.dto.CredentialsUserDTO;
-import ru.batorov.library.dto.PersonAdminDTO;
-import ru.batorov.library.dto.PersonWithBooksUserDTO;
-import ru.batorov.library.dto.PersonUserDTO;
-import ru.batorov.library.dto.PersonUserRestDTO;
-import ru.batorov.library.dto.PersonWithBooksAdminDTO;
 import ru.batorov.library.dto.RegistrationDTO;
 import ru.batorov.library.dto.RoleDTO;
+import ru.batorov.library.dto.book.BookAdminDTO;
+import ru.batorov.library.dto.book.BookOwnerDTO;
+import ru.batorov.library.dto.book.BookUserDTO;
+import ru.batorov.library.dto.book.BookUsersInfoDTO;
+import ru.batorov.library.dto.credentials.CredentialsAdminDTO;
+import ru.batorov.library.dto.credentials.CredentialsUserDTO;
+import ru.batorov.library.dto.credentials.PasswordDTO;
+import ru.batorov.library.dto.person.PersonAdminDTO;
+import ru.batorov.library.dto.person.PersonUserDTO;
+import ru.batorov.library.dto.person.PersonUserRestDTO;
+import ru.batorov.library.dto.person.PersonWithBooksAdminDTO;
+import ru.batorov.library.dto.person.PersonWithBooksUserDTO;
 import ru.batorov.library.models.Book;
 import ru.batorov.library.models.Person;
 import ru.batorov.library.models.Role;
@@ -70,6 +71,12 @@ public class DTOConvert {
 
 	public static Person converToPerson(CredentialsUserDTO CredentialsUserDTO, ModelMapper modelMapper) {
 		return modelMapper.map(CredentialsUserDTO, Person.class);
+	}
+	
+	public static Person converToPerson(PasswordDTO passwordDTO, ModelMapper modelMapper) {
+		Person person = new Person();
+		person.setPassword(passwordDTO.getPassword());
+		return person;
 	}
 
 	public static Person converToPerson(CredentialsAdminDTO credentialsAdminDTO, ModelMapper modelMapper) {

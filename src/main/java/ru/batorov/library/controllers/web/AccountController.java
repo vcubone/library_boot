@@ -1,6 +1,6 @@
 package ru.batorov.library.controllers.web;
 
-import static ru.batorov.library.util.AuthenticationHelper.getUserIdByAuthentication;
+import static ru.batorov.library.util.AuthenticationHelper.*;
 
 import java.util.Collection;
 
@@ -16,34 +16,33 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import ru.batorov.library.dto.BookUsersInfoDTO;
-import ru.batorov.library.dto.CredentialsUserDTO;
-import ru.batorov.library.dto.PersonUserDTO;
+import ru.batorov.library.dto.book.BookUsersInfoDTO;
+import ru.batorov.library.dto.credentials.CredentialsUserDTO;
+import ru.batorov.library.dto.credentials.PasswordDTO;
+import ru.batorov.library.dto.person.PersonUserDTO;
 import ru.batorov.library.models.Book;
 import ru.batorov.library.models.Person;
 import ru.batorov.library.services.PeopleService;
-import ru.batorov.library.util.PersonsCredentialsValidator;
-
+import ru.batorov.library.services.SessionService;
 import static ru.batorov.library.util.DTOConvert.*;
 
 @Controller
 @RequestMapping("/account")
 public class AccountController {
 	private final PeopleService peopleService;
-	private final PersonsCredentialsValidator credentialsValidator;
 	private final ModelMapper modelMapper;
+	private final SessionService sessionService;
 
-	public AccountController(PeopleService peopleService, PersonsCredentialsValidator credentialsValidator,
-			ModelMapper modelMapper) {
+	public AccountController(PeopleService peopleService, ModelMapper modelMapper, SessionService sessionService) {
 		this.peopleService = peopleService;
-		this.credentialsValidator = credentialsValidator;
 		this.modelMapper = modelMapper;
+		this.sessionService = sessionService;
 	}
 
 	@GetMapping("/main")
 	public String userInfo(Model model, Authentication authentication) {
-		Person person = peopleService.show(getUserIdByAuthentication(authentication));
-		Collection<Book> books = peopleService.getBooksByPersonId(person.getId());
+		Person person = peopleService.getPersonById(getUserIdByAuthentication(authentication));
+		Collection<Book> books = peopleService.findBooksByPersonId(person.getId());
 		Collection<BookUsersInfoDTO> bookUsersInfoDTOs = books.stream()
 				.map(book -> convertToBookUsersInfoDTO(book, modelMapper)).toList();
 		model.addAttribute("personUserDTO", convertToPersonUserDTO(person, modelMapper));
@@ -54,7 +53,7 @@ public class AccountController {
 
 	@GetMapping("/edit")
 	public String edit(Model model, Authentication authentication) {
-		Person person = peopleService.show(getUserIdByAuthentication(authentication));
+		Person person = peopleService.getPersonById(getUserIdByAuthentication(authentication));
 		model.addAttribute("personUserDTO", convertToPersonUserDTO(person, modelMapper));
 		return "account/edit";
 	}
@@ -73,22 +72,19 @@ public class AccountController {
 
 	@GetMapping("/credentials/edit")
 	public String editCredentials(Model model, Authentication authentication) {
-		Person person = peopleService.show(getUserIdByAuthentication(authentication));
-		person.setPassword(null);
-		model.addAttribute("credentialsUserDTO", convertToCredentialsUserDTO(person, modelMapper));
+		model.addAttribute("credentialsUserDTO", new CredentialsUserDTO());
 		return "account/credentials/edit";
 	}
 
 	@PatchMapping("/credentials/edit")
-	public String updateCredentials(@ModelAttribute("credentialsUserDTO") @Valid CredentialsUserDTO credentialsUserDTO,
+	public String updateCredentials(@ModelAttribute("credentialsUserDTO") @Valid PasswordDTO passwordDTO,
 			BindingResult bindingResult, Authentication authentication) {
-		Person person = converToPerson(credentialsUserDTO, modelMapper);
-		person.setId(getUserIdByAuthentication(authentication));
-		credentialsValidator.validate(person, bindingResult);
 		if (bindingResult.hasErrors())
 			return "account/credentials/edit";
+		Person person = converToPerson(passwordDTO, modelMapper);
 
-		peopleService.update(getUserIdByAuthentication(authentication), person);
+		peopleService.update(getUsernameByAuthentication(authentication), person);
+		sessionService.expireUserSessions(getUsernameByAuthentication(authentication));
 		return "redirect:/account/main";
 	}
 }

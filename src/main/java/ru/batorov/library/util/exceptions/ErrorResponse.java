@@ -1,4 +1,4 @@
-package ru.batorov.library.util;
+package ru.batorov.library.util.exceptions;
 
 public class ErrorResponse {
 	private String message;

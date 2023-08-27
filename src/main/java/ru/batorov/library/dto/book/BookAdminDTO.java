@@ -1,10 +1,10 @@
-package ru.batorov.library.dto;
+package ru.batorov.library.dto.book;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-public class BookUserDTO {
+public class BookAdminDTO {//TODO change dto system(duplicate fields, Inheritance, composition)
 	private Integer id;
 
 	@NotEmpty(message = "title shouldn't be empty")
@@ -17,6 +17,16 @@ public class BookUserDTO {
 
 	@Min(value = 0, message = "release_year > 0")
 	private Integer releaseYear;
+
+	public Boolean expired;
+
+	public Boolean isExpired() {
+		return expired;
+	}
+
+	public void setExpired(Boolean expired) {
+		this.expired = expired;
+	}
 
 	public String getTitle() {
 		return title;
@@ -48,5 +58,9 @@ public class BookUserDTO {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public Boolean getExpired() {
+		return expired;
 	}
 }

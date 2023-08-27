@@ -32,7 +32,7 @@ public class JwtFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-
+System.out.println("\n i was here \n");
 		String authHeader = request.getHeader("Authorization");// мы в этот хедер будет класть jwt
 		if (authHeader != null && !authHeader.isBlank() && authHeader.startsWith("Bearer "))
 		// jwt принято передавать под хедеров вверху и начинать с "Bearer "

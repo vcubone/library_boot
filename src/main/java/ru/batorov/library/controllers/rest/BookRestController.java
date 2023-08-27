@@ -28,14 +28,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import ru.batorov.library.dto.BookAdminDTO;
-import ru.batorov.library.dto.BookOwnerDTO;
-import ru.batorov.library.dto.BookUserDTO;
-import ru.batorov.library.dto.PersonUserDTO;
+import ru.batorov.library.dto.book.BookAdminDTO;
+import ru.batorov.library.dto.book.BookOwnerDTO;
+import ru.batorov.library.dto.book.BookUserDTO;
+import ru.batorov.library.dto.person.PersonUserDTO;
 import ru.batorov.library.models.Book;
 import ru.batorov.library.services.BookService;
 import ru.batorov.library.services.PeopleService;
-import ru.batorov.library.util.ErrorsGetter;
+import ru.batorov.library.util.exceptions.ErrorsGetter;
 import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
@@ -68,25 +68,25 @@ public class BookRestController {
     @Operation(summary = "Search for books that contains request string", tags = "Books")
     public Collection<BookUserDTO> search(@RequestParam(value = "findRequest") String findRequest) {
         if (findRequest != null && !findRequest.equals(""))
-            return convertToBookUserDTOCollection(bookService.getTitleContaining(findRequest), modelMapper);
+            return convertToBookUserDTOCollection(bookService.findBooksByTitleContaining(findRequest), modelMapper);
         return null;
     }
 
     @GetMapping("/{bookId}")
     @Operation(summary = "Gets book with required id", description = "Owners field depends on his existence and your role", tags = "Books")
     public BookOwnerDTO show(@PathVariable("bookId") int bookId, @ApiIgnore Authentication authentif) {
-        Book book = bookService.show(bookId);
+        Book book = bookService.getBookById(bookId);//TODO check человек должен же сам и так попасть в bookownerdto моделмапером
         BookOwnerDTO bookOwnerDTO = convertToBookOwnerDTO(book, modelMapper);
 
         if (book.getOwner() != null) {
-            // if admin or user = owner then keep person, otherwise return empty POJO
+            // if admin or user == owner then keep person, otherwise return empty POJO
             if (authentif != null && authentif.isAuthenticated() &&
                     (hasRoleByAuthentication(authentif, "ROLE_ADMIN")
                             || getUserIdByAuthentication(authentif) == book.getOwner().getId())) {
-                bookOwnerDTO.setPersonUserDTO(convertToPersonUserDTO(
-                        bookService.getPersonByBookId(bookId), modelMapper));
+                bookOwnerDTO.setOwner(convertToPersonUserDTO(
+                        bookService.findPersonByBookId(bookId), modelMapper));
             } else
-                bookOwnerDTO.setPersonUserDTO(new PersonUserDTO());
+                bookOwnerDTO.setOwner(new PersonUserDTO());
         }
         return bookOwnerDTO;
     }
@@ -128,7 +128,7 @@ public class BookRestController {
             @RequestParam(value = "ownersId", required = false) Integer ownersId,
             @PathVariable("bookId") int bookId,
             @ApiIgnore Authentication authentif) {
-        Book book = bookService.show(bookId);
+        Book book = bookService.getBookById(bookId);
         if (book.getOwner() == null) {
             int personId = getUserIdByAuthentication(authentif);
             if (ownersId != null) {
@@ -137,7 +137,7 @@ public class BookRestController {
                 else
                     throw new AccessDeniedException("Only admins can give books to other persons");
             }
-            bookService.addOwner(bookId, peopleService.show(personId));
+            bookService.addOwner(bookId, peopleService.getPersonById(personId));
         }
         return ResponseEntity.ok(HttpStatus.OK);
     }

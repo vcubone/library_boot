@@ -1,10 +1,14 @@
-package ru.batorov.library.dto;
+package ru.batorov.library.dto.person;
+
+import java.util.Collection;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-public class PersonUserDTO {
+import ru.batorov.library.dto.book.BookUsersInfoDTO;
+
+public class PersonWithBooksUserDTO {
 	private Integer id;
 	
     @NotEmpty(message = "name shouldn't be empty")
@@ -13,6 +17,16 @@ public class PersonUserDTO {
     
     @Min(value = 0, message = "yearOfBirth > 0")
     private Integer yearOfBirth;
+	
+	Collection<BookUsersInfoDTO> books;
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
 	public String getFullName() {
 		return fullName;
@@ -30,12 +44,12 @@ public class PersonUserDTO {
 		this.yearOfBirth = yearOfBirth;
 	}
 
-	public Integer getId() {
-		return id;
+	public Collection<BookUsersInfoDTO> getBooks() {
+		return books;
 	}
 
-	public void setId(Integer id) {
-		this.id = id;
+	public void setBooks(Collection<BookUsersInfoDTO> books) {
+		this.books = books;
 	}
-
+	
 }

@@ -1,8 +1,9 @@
 package ru.batorov.library.services;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -22,7 +23,9 @@ import ru.batorov.library.models.Role;
 import ru.batorov.library.repositories.PeopleRepository;
 import ru.batorov.library.security.PersonDetails;
 import ru.batorov.library.util.CopyHelper;
+import ru.batorov.library.util.exceptions.PersonNotFoundException;
 
+//TODO check if get find variations inserted int the right way
 @Service
 @Transactional(readOnly = true)
 public class PeopleService implements UserDetailsService {
@@ -46,46 +49,65 @@ public class PeopleService implements UserDetailsService {
         return peopleRepository.findAllWithRoles();
     }
 
-    public Person show(int person_id) {
+    public Person findPersonById(int person_id) {
         return peopleRepository.findById(person_id).orElse(null);
     }
 
-    public Person showWithRoles(int person_id) {
-        Person person = peopleRepository.findById(person_id).orElse(null);
+    public Person getPersonById(int person_id) {
+        return peopleRepository.findById(person_id).orElseThrow(() -> new PersonNotFoundException(person_id));
+    }
+
+    public Person findPersonWithRoles(int person_id) {
+        Person person = findPersonById(person_id);
         if (person != null)
             Hibernate.initialize(person.getRoles());
         return person;
     }
-    
-    
+
+    public Person getPersonWithRoles(int person_id) {
+        Person person = getPersonById(person_id);
+        Hibernate.initialize(person.getRoles());
+        return person;
+    }
 
     @Transactional
-    public void save(Person person){
+    public void save(Person person) {
         peopleRepository.save(person);
     }
-    
+
     @Transactional
     public void register(Person person) {
         person.setPassword(passwordEncoder.encode(person.getPassword()));
-        person.setRoles(Set.of(rolesService.getRoleByName("ROLE_USER").get()));
+        person.setRoles(Set.of(rolesService.getRoleByName("ROLE_USER")));
         save(person);
     }
 
     @Transactional
     public void update(int person_id, Person person) {
-        Person personToBeUpdated = show(person_id);
+        Person personToBeUpdated = getPersonById(person_id);
+        update(person, personToBeUpdated);
+    }
+
+    @Transactional
+    public void update(String username, Person person) {
+        Person personToBeUpdated = getPersonByUsername(username);
+        update(person, personToBeUpdated);
+    }
+
+    private void update(Person person, Person personToBeUpdated) {
         if (person.getPassword() != null)
             person.setPassword(passwordEncoder.encode(person.getPassword()));
         CopyHelper.copyNotNullProperties(person, personToBeUpdated);
         save(personToBeUpdated);
     }
+
     @Transactional
     public void delete(int person_id) {
         peopleRepository.deleteById(person_id);
     }
 
-    public Collection<Book> getBooksByPersonId(int person_id) {
-        Person person = show(person_id);
+    public Collection<Book> findBooksByPersonId(int person_id) {
+        Person person = getPersonById(person_id);
         if (person != null) {
             Hibernate.initialize(person.getBooks());
 
@@ -95,36 +117,38 @@ public class PeopleService implements UserDetailsService {
             });
             return person.getBooks();
         }
-        return Collections.emptyList();
+        return new ArrayList<>();
     }
 
-    public Collection<Person> getPersonByFullName(String name) {
+    public Collection<Person> findPersonsByFullName(String name) {
         return peopleRepository.findByFullName(name);
     }
 
-    public Optional<Person> getPersonByUsername(String username) {
-        return peopleRepository.findByUsername(username);
+    public Person getPersonByUsername(String username) {
+        return peopleRepository.findByUsername(username).get();
+    }
+
+    public Person findPersonByUsername(String username) {
+        return peopleRepository.findByUsername(username).orElse(null);
     }
 
     @Transactional
     public void addRole(int personId, Role role) {
-        Person person = show(personId);
-        if (person != null && role.getName() != null) {
+        if (role.getName() != null) {
+            Person person = getPersonWithRoles(personId);
             if (person.getRoles() == null)
-                person.setRoles(Collections.emptyList());
-            Role roleToAdd = rolesService.getRoleByName(role.getName()).get();
+                person.setRoles(new HashSet<>());
+            Role roleToAdd = rolesService.getRoleByName(role.getName());
             person.getRoles().add(roleToAdd);
             save(person);
         }
     }
 
-    //TODO разлогинивать человека при изменении ролей(сессия не меняется при изменении бд)
+    // TODO interceptor for role change
     @Transactional
     public void deleteRole(int personId, Role roleToDelete) {
-        Person person = show(personId);
-        if (person != null && !roleToDelete.getName().equals("ROLE_USER")) {
-            if (person.getRoles() == null)
-                return;
+        if (roleToDelete != null && !roleToDelete.getName().equals("ROLE_USER")) {
+            Person person = getPersonWithRoles(personId);
             person.getRoles().remove(roleToDelete);
             save(person);
         }
@@ -132,13 +156,14 @@ public class PeopleService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<Person> person = peopleRepository.findByUsername(username);
+        Optional<Person> opPerson = peopleRepository.findByUsername(username);
 
-        if (person.isEmpty())
+        if (opPerson.isEmpty())
             throw new UsernameNotFoundException("User not found");
+        Person person = opPerson.get();
 
-        Hibernate.initialize(person.get().getRoles());
+        Hibernate.initialize(person.getRoles());
 
-        return new PersonDetails(person.get());
+        return new PersonDetails(person);
     }
 }

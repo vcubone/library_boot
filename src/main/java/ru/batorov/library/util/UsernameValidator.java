@@ -1,7 +1,5 @@
 package ru.batorov.library.util;
 
-import java.util.Optional;
-
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -9,12 +7,11 @@ import org.springframework.validation.Validator;
 import ru.batorov.library.models.Person;
 import ru.batorov.library.services.PeopleService;
 
-
 @Component
-public class PersonsCredentialsValidator implements Validator {
+public class UsernameValidator implements Validator {
 	private final PeopleService peopleService;
 
-	public PersonsCredentialsValidator(PeopleService peopleService) {
+	public UsernameValidator(PeopleService peopleService) {
 		this.peopleService = peopleService;
 	}
 
@@ -25,9 +22,9 @@ public class PersonsCredentialsValidator implements Validator {
 
 	@Override
 	public void validate(Object target, Errors errors) {
-		Person person = (Person) target;
-		Optional<Person> opPerson = peopleService.getPersonByUsername(person.getUsername());
-		if (opPerson.isPresent() && person.getId() != opPerson.get().getId())
+		Person personToValidate = (Person) target;
+		Person existingPerson = peopleService.findPersonByUsername(personToValidate.getUsername());
+		if (existingPerson != null)
 			errors.rejectValue("username", "", "this username is already taken");
 	}
 }

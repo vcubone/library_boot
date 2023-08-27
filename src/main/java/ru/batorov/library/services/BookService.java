@@ -13,6 +13,7 @@ import ru.batorov.library.models.Book;
 import ru.batorov.library.models.Person;
 import ru.batorov.library.repositories.BookRepository;
 import ru.batorov.library.util.CopyHelper;
+import ru.batorov.library.util.exceptions.BookNotFoundException;
 
 @Service
 @Transactional(readOnly = true)
@@ -22,74 +23,77 @@ public class BookService {
     public BookService(BookRepository bookRepository) {
         this.bookRepository = bookRepository;
     }
-    
+
     public List<Book> all() {
         return all(false);
     }
-    //sort
+
+    // sort
     public List<Book> all(Boolean sortByYear) {
-        return sortByYear? bookRepository.findAll(Sort.by("releaseYear")) :bookRepository.findAll();
+        return sortByYear ? bookRepository.findAll(Sort.by("releaseYear")) : bookRepository.findAll();
     }
-    //sort + pageable
+
+    // sort + pageable
     public List<Book> all(Boolean sortByYear, int page, int itemsPerPage) {
-        return sortByYear? bookRepository.findAll(PageRequest.of(page, itemsPerPage, Sort.by("releaseYear"))).getContent() 
-            :bookRepository.findAll(PageRequest.of(page, itemsPerPage)).getContent();
+        return sortByYear
+                ? bookRepository.findAll(PageRequest.of(page, itemsPerPage, Sort.by("releaseYear"))).getContent()
+                : bookRepository.findAll(PageRequest.of(page, itemsPerPage)).getContent();
     }
-    
+
     @Transactional
     public void save(Book book) {
         bookRepository.save(book);
     }
-    
-    public Book show(int bookId) {
+
+    public Book findBookById(int bookId) {
         return bookRepository.findById(bookId).orElse(null);
     }
-    
+
+    public Book getBookById(int bookId) {
+        return bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException(bookId));
+    }
+
     @Transactional
-    public void update(int bookId, Book updatedBook)
-    {
-        Book bookToBeUpdated = bookRepository.findById(bookId).orElse(null);
+    public void update(int bookId, Book updatedBook) {
+        Book bookToBeUpdated = getBookById(bookId);
         if (bookToBeUpdated == null)
             return;
         CopyHelper.copyNotNullProperties(updatedBook, bookToBeUpdated);
         bookRepository.save(bookToBeUpdated);
     }
-    
+
     @Transactional
-    public void delete(int bookId)
-    {
-        bookRepository.deleteById(bookId);;
+    public void delete(int bookId) {
+        bookRepository.deleteById(bookId);
+        ;
     }
-    
+
     @Transactional
-    public void addOwner(int bookId, Person person)
-    {
-        bookRepository.findById(bookId).ifPresent(book->{
+    public void addOwner(int bookId, Person person) {
+        bookRepository.findById(bookId).ifPresent(book -> {
             book.setOwner(person);
             book.setTakeTime(new Date());
         });
     }
-    
+
     @Transactional
-    public void deleteOwner(int bookId)
-    {
-        bookRepository.findById(bookId).ifPresent(book-> 
-            book.setOwner(null)
-        );
+    public void deleteOwner(int bookId) {
+        bookRepository.findById(bookId).ifPresent(book -> book.setOwner(null));
     }
-    
-    public List<Book> getTitleContaining(String findRequest)
-    {
+
+    public List<Book> findBooksByTitleContaining(String findRequest) {
         return bookRepository.findByTitleContaining(findRequest);
     }
-    
-    public Person getPersonByBookId(int bookId)
-    {
-        Book book = show(bookId);
-        if (book != null){
-            Hibernate.initialize(book.getOwner());
-            return book.getOwner();
-        }
-        return null;
+
+    public Person findPersonByBookId(int bookId) {
+        Book book = getBookById(bookId);
+        Hibernate.initialize(book.getOwner());
+        return book.getOwner() == null ? null : book.getOwner();
+    }
+
+    public Person getPersonByBookId(int bookId) {
+        Book book = getBookById(bookId);
+        Hibernate.initialize(book.getOwner());
+        return book.getOwner();
     }
 }

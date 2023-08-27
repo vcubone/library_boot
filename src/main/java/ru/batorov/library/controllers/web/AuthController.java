@@ -13,19 +13,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import ru.batorov.library.dto.RegistrationDTO;
 import ru.batorov.library.models.Person;
 import ru.batorov.library.services.PeopleService;
-import ru.batorov.library.util.PersonsCredentialsValidator;
+import ru.batorov.library.util.UsernameValidator;
 
 @Controller
 @RequestMapping("/auth")
 public class AuthController {
 	private final PeopleService peopleService;
-	private final PersonsCredentialsValidator personCredentialsValidator;
+	private final UsernameValidator usernameValidator;
 	private final ModelMapper modelMapper;
 
 	public AuthController(PeopleService peopleService,
-			PersonsCredentialsValidator credentialsValidator, ModelMapper modelMapper) {
+			UsernameValidator usernameValidator, ModelMapper modelMapper) {
 		this.peopleService = peopleService;
-		this.personCredentialsValidator = credentialsValidator;
+		this.usernameValidator = usernameValidator;
 		this.modelMapper = modelMapper;
 	}
 
@@ -45,7 +45,7 @@ public class AuthController {
 			BindingResult bindingResult) {
 		Person person = modelMapper.map(registrationDTO, Person.class);
 
-		personCredentialsValidator.validate(person, bindingResult);
+		usernameValidator.validate(person, bindingResult);
 
 		if (bindingResult.hasErrors())
 			return "/auth/register";

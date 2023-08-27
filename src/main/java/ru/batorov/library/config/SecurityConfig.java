@@ -16,9 +16,10 @@ import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
-import ru.batorov.library.security.jwt.JwtConfigurer;
+import ru.batorov.library.security.jwt.JwtFilter;
 import ru.batorov.library.security.jwt.JwtProvider;
 import ru.batorov.library.services.PeopleService;
 
@@ -71,10 +72,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Configuration
 	@Order(1)
 	public class ApiSecurityAdapter extends WebSecurityConfigurerAdapter {
-		private JwtProvider jwtProvider;
+		private JwtFilter jwtFilter;
 
-		public ApiSecurityAdapter(JwtProvider jwtProvider) {
-			this.jwtProvider = jwtProvider;
+		public ApiSecurityAdapter(JwtFilter jwtFilter) {
+			this.jwtFilter = jwtFilter;
 		}
 
 		@Override
@@ -89,7 +90,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 					.antMatchers(USER_API_WHITELIST).hasRole("USER")
 					.anyRequest().hasAnyRole("ADMIN")
 					.and()
-					.apply(new JwtConfigurer(jwtProvider, peopleService));
+					.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 		}
 	}
 

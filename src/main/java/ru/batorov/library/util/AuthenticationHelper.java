@@ -2,7 +2,6 @@ package ru.batorov.library.util;
 
 import org.springframework.security.core.Authentication;
 
-import ru.batorov.library.models.Person;
 import ru.batorov.library.security.PersonDetails;
 
 public class AuthenticationHelper {
@@ -10,8 +9,8 @@ public class AuthenticationHelper {
 		return ((PersonDetails) authentication.getPrincipal()).getPerson().getId();
 	}
 	
-	public static Person getPersonFromAuthentication(Authentication authentication){
-		return ((PersonDetails) authentication.getPrincipal()).getPerson();
+	public static String getUsernameByAuthentication(Authentication authentication) {
+		return ((PersonDetails) authentication.getPrincipal()).getUsername();
 	}
 
 	public static boolean hasRoleByAuthentication(Authentication authentication, String role) {
