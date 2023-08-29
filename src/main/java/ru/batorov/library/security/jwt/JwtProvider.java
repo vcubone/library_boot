@@ -33,9 +33,9 @@ public class JwtProvider {
 	public String ValidateTokenAndRetrieveClaim(String token) throws JWTVerificationException {
 		JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secret))
 				.withSubject("User details")// должен быть такой смысл
-				.withIssuer("Batorov")//должен быть определенный автор
+				.withIssuer("Batorov")// должен быть определенный автор
 				.build();
-				
+
 		DecodedJWT jwt = verifier.verify(token);
 		return jwt.getClaim("username").asString();
 	}

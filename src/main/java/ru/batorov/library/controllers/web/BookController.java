@@ -57,12 +57,14 @@ public class BookController {
     @GetMapping("/search")
     public String search(Model model, @RequestParam(value = "findRequest", required = false) String findRequest) {
         if (findRequest != null && !findRequest.equals(""))
-            model.addAttribute("bookUserDTOs", convertToBookUserDTOCollection(bookService.findBooksByTitleContaining(findRequest), modelMapper));
+            model.addAttribute("bookUserDTOs",
+                    convertToBookUserDTOCollection(bookService.findBooksByTitleContaining(findRequest), modelMapper));
         return "books/search";
     }
 
     @GetMapping("/{bookId}")
-    public String show(@PathVariable("bookId") int bookId, Model model, @ModelAttribute("personUserDTO") PersonUserDTO personUserDTO,
+    public String show(@PathVariable("bookId") int bookId, Model model,
+            @ModelAttribute("personUserDTO") PersonUserDTO personUserDTO,
             Authentication authentif) {
         Book book = bookService.getBookById(bookId);
         model.addAttribute("bookUsersInfoDTO", convertToBookUsersInfoDTO(book, modelMapper));
@@ -71,9 +73,10 @@ public class BookController {
             // admin logged in
             if (authentif != null && authentif.isAuthenticated() &&
                     hasRoleByAuthentication(authentif, "ROLE_ADMIN"))
-                model.addAttribute("personUserDTOs", convertToPersonUserDTOCollection(peopleService.all(), modelMapper));
+                model.addAttribute("personUserDTOs",
+                        convertToPersonUserDTOCollection(peopleService.all(), modelMapper));
         } else {
-            model.addAttribute("owner", convertToPersonUserDTO(bookService.getPersonByBookId(bookId), modelMapper));
+            model.addAttribute("owner", convertToPersonUserDTO(bookService.getBooksOwner(bookId), modelMapper));
             // user that logged in owns this book
             if (authentif != null && authentif.isAuthenticated() &&
                     getUserIdByAuthentication(authentif) == book.getOwner().getId())
@@ -89,7 +92,8 @@ public class BookController {
     }
 
     @PostMapping("/new")
-    public String create(@ModelAttribute("bookAdminDTO") @Valid BookAdminDTO bookAdminDTO, BindingResult bindingResult) {
+    public String create(@ModelAttribute("bookAdminDTO") @Valid BookAdminDTO bookAdminDTO,
+            BindingResult bindingResult) {
         Book book = converToBook(bookAdminDTO, modelMapper);
         if (bindingResult.hasErrors())
             return "books/new";
@@ -120,7 +124,8 @@ public class BookController {
     }
 
     @PatchMapping("/{bookId}/addowner")
-    public String addowner(@PathVariable("bookId") int bookId, @ModelAttribute("personUserDTO") PersonUserDTO personUserDTO,
+    public String addowner(@PathVariable("bookId") int bookId,
+            @ModelAttribute("personUserDTO") PersonUserDTO personUserDTO,
             Authentication authentif) {
         Person person = converToPerson(personUserDTO, modelMapper);
         if (person.getId() == null) {
@@ -140,7 +145,7 @@ public class BookController {
         if (hasRoleByAuthentication(authentif, "ROLE_ADMIN") || // если админ это делает или
                 (hasRoleByAuthentication(authentif, "ROLE_USER") && // юзер с
                         getUserIdByAuthentication(authentif) == bookService
-                                .findPersonByBookId(bookId).getId())// id, совпадающим с владельцем книги
+                                .findBooksOwner(bookId).getId())// id, совпадающим с владельцем книги
         )
             bookService.deleteOwner(bookId);
         return "redirect:" + request.getHeader("referer");

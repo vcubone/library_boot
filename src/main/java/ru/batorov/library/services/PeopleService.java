@@ -57,6 +57,11 @@ public class PeopleService implements UserDetailsService {
         return peopleRepository.findById(person_id).orElseThrow(() -> new PersonNotFoundException(person_id));
     }
 
+    @Deprecated
+    public Person getAuthenticationsInformation(Integer personId) {
+        return peopleRepository.getAuthenticationsInformation(personId);
+    }
+
     public Person findPersonWithRoles(int person_id) {
         Person person = findPersonById(person_id);
         if (person != null)
@@ -67,6 +72,14 @@ public class PeopleService implements UserDetailsService {
     public Person getPersonWithRoles(int person_id) {
         Person person = getPersonById(person_id);
         Hibernate.initialize(person.getRoles());
+        return person;
+    }
+
+    public Person getPersonWithRolesAndBooks(int person_id) {
+        Person person = getPersonById(person_id);
+        Hibernate.initialize(person.getRoles());
+        Hibernate.initialize(person.getBooks());
+        setExpired(person.getBooks());
         return person;
     }
 
@@ -111,10 +124,7 @@ public class PeopleService implements UserDetailsService {
         if (person != null) {
             Hibernate.initialize(person.getBooks());
 
-            person.getBooks().forEach(book -> {
-                long time = Math.abs(new Date().getTime() - book.getTakeTime().getTime());
-                book.setExpired(864000000 < time);
-            });
+            setExpired(person.getBooks());
             return person.getBooks();
         }
         return new ArrayList<>();
@@ -140,6 +150,8 @@ public class PeopleService implements UserDetailsService {
                 person.setRoles(new HashSet<>());
             Role roleToAdd = rolesService.getRoleByName(role.getName());
             person.getRoles().add(roleToAdd);
+            person.setVersion(person.getVersion() + 1);
+
             save(person);
         }
     }
@@ -150,6 +162,7 @@ public class PeopleService implements UserDetailsService {
         if (roleToDelete != null && !roleToDelete.getName().equals("ROLE_USER")) {
             Person person = getPersonWithRoles(personId);
             person.getRoles().remove(roleToDelete);
+            person.setVersion(person.getVersion() + 1);
             save(person);
         }
     }
@@ -165,5 +178,12 @@ public class PeopleService implements UserDetailsService {
         Hibernate.initialize(person.getRoles());
 
         return new PersonDetails(person);
+    }
+
+    private void setExpired(Collection<Book> books) {
+        books.forEach(book -> {
+            long time = Math.abs(new Date().getTime() - book.getTakeTime().getTime());
+            book.setExpired(864000000 < time);
+        });
     }
 }

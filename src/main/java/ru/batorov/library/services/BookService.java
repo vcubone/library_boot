@@ -52,6 +52,12 @@ public class BookService {
     public Book getBookById(int bookId) {
         return bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException(bookId));
     }
+    
+    public Book getBookByIdWithOwner(int bookId) {
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException(bookId));
+        Hibernate.initialize(book.getOwner());
+        return book;
+    }
 
     @Transactional
     public void update(int bookId, Book updatedBook) {
@@ -85,13 +91,13 @@ public class BookService {
         return bookRepository.findByTitleContaining(findRequest);
     }
 
-    public Person findPersonByBookId(int bookId) {
+    public Person findBooksOwner(int bookId) {
         Book book = getBookById(bookId);
         Hibernate.initialize(book.getOwner());
         return book.getOwner() == null ? null : book.getOwner();
     }
 
-    public Person getPersonByBookId(int bookId) {
+    public Person getBooksOwner(int bookId) {
         Book book = getBookById(bookId);
         Hibernate.initialize(book.getOwner());
         return book.getOwner();

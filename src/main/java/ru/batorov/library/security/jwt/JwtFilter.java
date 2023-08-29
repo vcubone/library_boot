@@ -10,29 +10,24 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 
 import ru.batorov.library.services.PeopleService;
 
-@Component
 public class JwtFilter extends OncePerRequestFilter {
 	private final JwtProvider jwtTokenProvider;
 	private final PeopleService peopleService;
-
 
 	public JwtFilter(JwtProvider jwtTokenProvider, PeopleService peopleService) {
 		this.jwtTokenProvider = jwtTokenProvider;
 		this.peopleService = peopleService;
 	}
 
-
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-System.out.println("\n i was here \n");
 		String authHeader = request.getHeader("Authorization");// мы в этот хедер будет класть jwt
 		if (authHeader != null && !authHeader.isBlank() && authHeader.startsWith("Bearer "))
 		// jwt принято передавать под хедеров вверху и начинать с "Bearer "

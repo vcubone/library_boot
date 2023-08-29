@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
+import ru.batorov.library.security.AuthenticationCheckFilter;
 import ru.batorov.library.security.jwt.JwtFilter;
 import ru.batorov.library.security.jwt.JwtProvider;
 import ru.batorov.library.services.PeopleService;
@@ -72,10 +73,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Configuration
 	@Order(1)
 	public class ApiSecurityAdapter extends WebSecurityConfigurerAdapter {
-		private JwtFilter jwtFilter;
+		private final JwtProvider jwtTokenProvider;
 
-		public ApiSecurityAdapter(JwtFilter jwtFilter) {
-			this.jwtFilter = jwtFilter;
+		public ApiSecurityAdapter(JwtProvider jwtTokenProvider) {
+			this.jwtTokenProvider = jwtTokenProvider;
 		}
 
 		@Override
@@ -90,7 +91,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 					.antMatchers(USER_API_WHITELIST).hasRole("USER")
 					.anyRequest().hasAnyRole("ADMIN")
 					.and()
-					.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+					.addFilterBefore(new JwtFilter(jwtTokenProvider, peopleService),
+							UsernamePasswordAuthenticationFilter.class);
 		}
 	}
 
@@ -101,7 +103,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		protected void configure(HttpSecurity http) throws Exception {
 			Stream.of(USER_WHITELIST);
 			http
-					.sessionManagement(management -> management.maximumSessions(2).sessionRegistry(getSessionRegistry()))
+					.sessionManagement(
+							management -> management.maximumSessions(2).sessionRegistry(getSessionRegistry()))
 					.authorizeHttpRequests()
 					.antMatchers(SWAGGER_WHITELIST).permitAll()
 					.antMatchers(ALL_WHITELIST).permitAll()
@@ -113,7 +116,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 							.defaultSuccessUrl("/", true)
 							.failureUrl("/auth/login?error"))
 					.logout(logout -> logout.logoutUrl("/logout")
-							.logoutSuccessUrl("/"));
+							.logoutSuccessUrl("/"))
+					.addFilterBefore(new AuthenticationCheckFilter(peopleService),
+							UsernamePasswordAuthenticationFilter.class);
 		}
 	}
 

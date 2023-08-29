@@ -21,8 +21,12 @@ public class RolesService {
 	public List<Role> all(){
 		return rolesRepository.findAll();
 	}
-	Role getRoleByName(String name)
+	public Role getRoleByName(String name)
 	{
 		return rolesRepository.findByName(name).orElseThrow(() -> new RoleNotFoundException(name));
+	}
+	public List<Role> findPersonsRoles(Integer personId)
+	{
+		return rolesRepository.findRolesByPersonId(personId);
 	}
 }

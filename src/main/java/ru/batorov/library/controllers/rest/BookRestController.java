@@ -31,8 +31,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import ru.batorov.library.dto.book.BookAdminDTO;
 import ru.batorov.library.dto.book.BookOwnerDTO;
 import ru.batorov.library.dto.book.BookUserDTO;
-import ru.batorov.library.dto.person.PersonUserDTO;
 import ru.batorov.library.models.Book;
+import ru.batorov.library.models.Person;
 import ru.batorov.library.services.BookService;
 import ru.batorov.library.services.PeopleService;
 import ru.batorov.library.util.exceptions.ErrorsGetter;
@@ -75,24 +75,22 @@ public class BookRestController {
     @GetMapping("/{bookId}")
     @Operation(summary = "Gets book with required id", description = "Owners field depends on his existence and your role", tags = "Books")
     public BookOwnerDTO show(@PathVariable("bookId") int bookId, @ApiIgnore Authentication authentif) {
-        Book book = bookService.getBookById(bookId);//TODO check человек должен же сам и так попасть в bookownerdto моделмапером
-        BookOwnerDTO bookOwnerDTO = convertToBookOwnerDTO(book, modelMapper);
-
+        Book book = bookService.getBookByIdWithOwner(bookId);
         if (book.getOwner() != null) {
-            // if admin or user == owner then keep person, otherwise return empty POJO
-            if (authentif != null && authentif.isAuthenticated() &&
-                    (hasRoleByAuthentication(authentif, "ROLE_ADMIN")
-                            || getUserIdByAuthentication(authentif) == book.getOwner().getId())) {
-                bookOwnerDTO.setOwner(convertToPersonUserDTO(
-                        bookService.findPersonByBookId(bookId), modelMapper));
+            if (authentif != null && authentif.isAuthenticated())
+            {
+                // not admin or owner -> empty person
+                if(!hasRoleByAuthentication(authentif, "ROLE_ADMIN") && getUserIdByAuthentication(authentif) != book.getOwner().getId())
+                    book.setOwner(new Person());
             } else
-                bookOwnerDTO.setOwner(new PersonUserDTO());
+            book.setOwner(new Person());
         }
+        BookOwnerDTO bookOwnerDTO = convertToBookOwnerDTO(book, modelMapper);
         return bookOwnerDTO;
     }
 
     @PostMapping("/new")
-    @Operation(summary = "Creates a new book",description = "Admins only", tags = "Books", security = @SecurityRequirement(name = "Bearer Authentication"))
+    @Operation(summary = "Creates a new book", description = "Admins only", tags = "Books", security = @SecurityRequirement(name = "Bearer Authentication"))
     @ApiResponse(responseCode = "400", description = "Bad input values")
     public ResponseEntity<HttpStatus> create(@RequestBody @Valid BookAdminDTO bookAdminDTO,
             @ApiIgnore BindingResult bindingResult) {
@@ -148,7 +146,7 @@ public class BookRestController {
             @ApiIgnore Authentication authentif) {
         // если админ это делает или id, совпадающим с владельцем книги
         if (hasRoleByAuthentication(authentif, "ROLE_ADMIN") ||
-                (getUserIdByAuthentication(authentif) == bookService.getPersonByBookId(bookId).getId()))
+                (getUserIdByAuthentication(authentif) == bookService.getBooksOwner(bookId).getId()))
             bookService.deleteOwner(bookId);
         return ResponseEntity.ok(HttpStatus.OK);
     }

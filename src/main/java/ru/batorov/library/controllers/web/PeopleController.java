@@ -111,14 +111,14 @@ public class PeopleController {
     @PatchMapping("/{personId}/edit/deleterole")
     public String deleteRole(@ModelAttribute("roleDTO") RoleDTO roleDTO, @PathVariable("personId") int personId) {
         peopleService.deleteRole(personId, convertToRole(roleDTO, modelMapper));
-        sessionService.expireUserSessions(personId);
+        // sessionService.expireUserSessions(personId);
         return "redirect:/people/" + personId + "/edit";
     }
 
     @PatchMapping("/{personId}/edit/addrole")
     public String addRole(@ModelAttribute("roleDTO") RoleDTO roleDTO, @PathVariable("personId") int personId) {
         peopleService.addRole(personId, convertToRole(roleDTO, modelMapper));
-        sessionService.expireUserSessions(personId);
+        // sessionService.expireUserSessions(personId);
         return "redirect:/people/" + personId + "/edit";
     }
 

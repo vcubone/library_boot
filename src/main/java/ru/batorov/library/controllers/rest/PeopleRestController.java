@@ -73,12 +73,8 @@ public class PeopleRestController {
     @Operation(summary = "Shows user info", tags = "People", security = @SecurityRequirement(name = "Bearer Authentication"))
     @GetMapping("/{id}")
     public PersonWithBooksAdminDTO show(@PathVariable("id") int personId, Model model) {
-        Person person = peopleService.getPersonWithRoles(personId);//TODO сделать метод для всего сразу
-        person.setBooks(null);
-        // use getBooks -> LazyInitializationException
+        Person person = peopleService.getPersonWithRolesAndBooks(personId);
         PersonWithBooksAdminDTO personWithBooksAdminDTO = convertToPersonWithBooksAdminDTO(person, modelMapper);
-        personWithBooksAdminDTO
-                .setBooks(convertToBookAdminDTOCollection(peopleService.findBooksByPersonId(personId), modelMapper));
         return personWithBooksAdminDTO;
     }
 

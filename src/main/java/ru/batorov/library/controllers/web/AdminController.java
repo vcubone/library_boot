@@ -18,6 +18,7 @@ public class AdminController {
 	@GetMapping("")
     public String adminPage(){
 		adminService.onlyAdminCanPass();
+		
         return "admin/adminHome";
     }
 }
