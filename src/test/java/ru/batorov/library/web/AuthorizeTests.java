@@ -29,7 +29,7 @@ public class AuthorizeTests {
 	@Test
 	public void correctLoginTest() throws Exception {
 		ResultActions resultActions = this.mvc.perform(
-				formLogin("http://localhost/process_login").user("testing").password("testing"));
+				formLogin("http://localhost/process_login").user("test").password("test"));
 		resultActions.andDo(print())
 				.andExpect(status().is3xxRedirection())
 				.andExpect(redirectedUrl("/"));

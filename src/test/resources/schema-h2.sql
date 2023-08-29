@@ -5,7 +5,8 @@ create table IF NOT EXISTS person(
     full_name varchar(100) not null,
     year_of_birth int not null,
     created_at timestamp not null DEFAULT CURRENT_TIMESTAMP,
-    updated_at timestamp not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP	
+    updated_at timestamp not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    version int not null DEFAULT 1
 );
 CREATE TABLE if NOT EXISTS role(
     id int, PRIMARY KEY(id),
