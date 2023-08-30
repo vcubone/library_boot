@@ -8,25 +8,34 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import ru.batorov.library.util.ErrorResponse;
+import ru.batorov.library.util.exceptions.BookNotFoundException;
+import ru.batorov.library.util.exceptions.ErrorResponse;
+import ru.batorov.library.util.exceptions.PersonNotFoundException;
+import ru.batorov.library.util.exceptions.RoleNotFoundException;
 
 @ControllerAdvice
 public class GlobalControllerExceptionHandler {
-	@ExceptionHandler
+	@ExceptionHandler(IllegalArgumentException.class)
 	private ResponseEntity<ErrorResponse> handlerException(IllegalArgumentException e) {
 		ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), System.currentTimeMillis());
 		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);// 400
 	}
 	
-	@ExceptionHandler
+	@ExceptionHandler(BadCredentialsException.class)
 	private ResponseEntity<ErrorResponse> handlerException(BadCredentialsException e) {
 		ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), System.currentTimeMillis());
 		return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);// 401
 	}
 	
-	@ExceptionHandler
+	@ExceptionHandler(AccessDeniedException.class)
 	private ResponseEntity<ErrorResponse> handlerException(AccessDeniedException e) {
 		ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), System.currentTimeMillis());
 		return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);// 403
+	}
+	
+	@ExceptionHandler({PersonNotFoundException.class, RoleNotFoundException.class, BookNotFoundException.class})
+	private ResponseEntity<ErrorResponse> handlerException(RuntimeException e) {
+		ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), System.currentTimeMillis());
+		return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);// 500
 	}
 }

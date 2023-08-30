@@ -1,4 +1,4 @@
-package ru.batorov.library.dto;
+package ru.batorov.library.dto.person;
 
 import java.util.Collection;
 
@@ -6,7 +6,9 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-public class PersonWithBooksAdminDTO {
+import ru.batorov.library.dto.RoleDTO;
+
+public class PersonAdminDTO {
 	private Integer id;
 	
     @NotEmpty(message = "name shouldn't be empty")
@@ -16,8 +18,6 @@ public class PersonWithBooksAdminDTO {
     @Min(value = 0, message = "yearOfBirth > 0")
     private Integer yearOfBirth;
 
-	Collection<BookAdminDTO> books;
-	
 	Collection<RoleDTO> roles;
 
 	public Integer getId() {
@@ -42,14 +42,6 @@ public class PersonWithBooksAdminDTO {
 
 	public void setYearOfBirth(Integer yearOfBirth) {
 		this.yearOfBirth = yearOfBirth;
-	}
-
-	public Collection<BookAdminDTO> getBooks() {
-		return books;
-	}
-
-	public void setBooks(Collection<BookAdminDTO> books) {
-		this.books = books;
 	}
 
 	public Collection<RoleDTO> getRoles() {

@@ -21,7 +21,7 @@ import static org.springframework.security.test.web.servlet.response.SecurityMoc
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")
-@WithUserDetails("testing")
+@WithUserDetails("test")
 @Sql(value = {"/create-users-before.sql"}, executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(value = {"/create-users-after.sql"}, executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 public class RoleUserTests {

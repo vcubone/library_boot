@@ -19,13 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import ru.batorov.library.dto.CredentialsUserDTO;
 import ru.batorov.library.dto.RegistrationDTO;
+import ru.batorov.library.dto.credentials.CredentialsUserDTO;
 import ru.batorov.library.models.Person;
 import ru.batorov.library.security.jwt.JwtProvider;
 import ru.batorov.library.services.PeopleService;
-import ru.batorov.library.util.ErrorsGetter;
-import ru.batorov.library.util.PersonsCredentialsValidator;
+import ru.batorov.library.util.UsernameValidator;
+import ru.batorov.library.util.exceptions.ErrorsGetter;
 import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
@@ -36,11 +36,11 @@ public class AuthRestController {
 	private final PeopleService peopleService;
 	private final JwtProvider jwtProvider;
 	private final ModelMapper modelMapper;
-	private final PersonsCredentialsValidator personsCredentialsValidator;
+	private final UsernameValidator personsCredentialsValidator;
 
 	public AuthRestController(AuthenticationManager authenticationManager,
 			PeopleService peopleService, JwtProvider jwtProvider, ModelMapper modelMapper,
-			PersonsCredentialsValidator personsCredentialsValidator) {
+			UsernameValidator personsCredentialsValidator) {
 		this.authenticationManager = authenticationManager;
 		this.peopleService = peopleService;
 		this.jwtProvider = jwtProvider;

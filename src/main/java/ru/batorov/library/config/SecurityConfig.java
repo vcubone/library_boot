@@ -4,27 +4,27 @@ import java.util.stream.Stream;
 
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
-import ru.batorov.library.security.jwt.JwtConfigurer;
+import ru.batorov.library.security.AuthenticationCheckFilter;
+import ru.batorov.library.security.jwt.JwtFilter;
 import ru.batorov.library.security.jwt.JwtProvider;
-import ru.batorov.library.services.JwtBlackListService;
 import ru.batorov.library.services.PeopleService;
 
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig {
 	private static final String[] SWAGGER_WHITELIST = {
 			// -- Swagger UI v2
 			"/v2/api-docs",
@@ -58,77 +58,74 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.toArray(String[]::new);
 
 	private final PeopleService peopleService;
-	private final JwtBlackListService jwtBlackListService;
+	private final JwtProvider jwtTokenProvider;
 
-	public SecurityConfig(PeopleService peopleService, JwtBlackListService jwtBlackListService) {
+	public SecurityConfig(PeopleService peopleService, JwtProvider jwtTokenProvider) {
 		this.peopleService = peopleService;
-		this.jwtBlackListService = jwtBlackListService;
+		this.jwtTokenProvider = jwtTokenProvider;
 	}
 
-	// настраиваем аутентификацию
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(peopleService).passwordEncoder(getPasswordEncoder());
+	@Bean
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+			throws Exception {
+		return authenticationConfiguration.getAuthenticationManager();
 	}
+	/*
+	 * замена 
+	 * нет .userDetailsService и .passwordEncoder норм?
+	 * @Override
+	 * protected void configure(AuthenticationManagerBuilder auth) throws Exception
+	 * {
+	 * auth.userDetailsService(peopleService).passwordEncoder(getPasswordEncoder());
+	 * }
+	 */
 
-	@Configuration
+	@Bean
 	@Order(1)
-	public class ApiSecurityAdapter extends WebSecurityConfigurerAdapter {
-		private JwtProvider jwtProvider;
+	public SecurityFilterChain ApiFilterChain(HttpSecurity http) throws Exception {
 
-		public ApiSecurityAdapter(JwtProvider jwtProvider) {
-			this.jwtProvider = jwtProvider;
-		}
-
-		@Override
-		protected void configure(HttpSecurity http) throws Exception {
-			http
-					.csrf(csrf -> csrf.disable())
-					.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-							.sessionFixation().newSession())
-					.antMatcher("/api/**") // <= Security only available for /api/**
-					.authorizeHttpRequests()
-					.antMatchers(ALL_API_WHITELIST).permitAll()
-					.antMatchers(USER_API_WHITELIST).hasRole("USER")
-					.anyRequest().hasAnyRole("ADMIN")
-					.and()
-					.apply(new JwtConfigurer(jwtProvider, peopleService, jwtBlackListService));
-		}
+		http
+				.csrf(csrf -> csrf.disable())
+				.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+						.sessionFixation().newSession())
+				.antMatcher("/api/**") // <= Security only available for /api/**
+				.authorizeHttpRequests()
+				.antMatchers(ALL_API_WHITELIST).permitAll()
+				.antMatchers(USER_API_WHITELIST).hasRole("USER")
+				.anyRequest().hasAnyRole("ADMIN")
+				.and()
+				.addFilterBefore(new JwtFilter(jwtTokenProvider, peopleService),
+						UsernamePasswordAuthenticationFilter.class);
+		return http.build();
 	}
 
-	@Configuration
+	@Bean
 	@Order(2)
-	public class WebSecurityAdapter extends WebSecurityConfigurerAdapter {
-		@Override
-		protected void configure(HttpSecurity http) throws Exception {
-			Stream.of(USER_WHITELIST);
-			http
-					.sessionManagement(management -> management.maximumSessions(2).sessionRegistry(getSessionRegistry()))
-					.authorizeHttpRequests()
-					.antMatchers(SWAGGER_WHITELIST).permitAll()
-					.antMatchers(ALL_WHITELIST).permitAll()
-					.antMatchers(USER_WHITELIST).hasRole("USER")
-					.anyRequest().hasAnyRole("ADMIN")
-					.and()
-					.formLogin(login -> login.loginPage("/auth/login")
-							.loginProcessingUrl("/process_login")
-							.defaultSuccessUrl("/", true)
-							.failureUrl("/auth/login?error"))
-					.logout(logout -> logout.logoutUrl("/logout")
-							.logoutSuccessUrl("/"));
-		}
+	public SecurityFilterChain WebFilterChain(HttpSecurity http) throws Exception {
+		http
+				.sessionManagement(
+						management -> management.maximumSessions(2).sessionRegistry(getSessionRegistry()))
+				.authorizeHttpRequests()
+				.antMatchers(SWAGGER_WHITELIST).permitAll()
+				.antMatchers(ALL_WHITELIST).permitAll()
+				.antMatchers(USER_WHITELIST).hasRole("USER")
+				.anyRequest().hasAnyRole("ADMIN")
+				.and()
+				.formLogin(login -> login.loginPage("/auth/login")
+						.loginProcessingUrl("/process_login")
+						.defaultSuccessUrl("/", true)
+						.failureUrl("/auth/login?error"))
+				.logout(logout -> logout.logoutUrl("/logout")
+						.logoutSuccessUrl("/"))
+				.addFilterBefore(new AuthenticationCheckFilter(peopleService),
+						UsernamePasswordAuthenticationFilter.class);
+		return http.build();
 	}
 
 	// показывает как шифруются пароли
 	@Bean
 	public PasswordEncoder getPasswordEncoder() {
 		return new BCryptPasswordEncoder();
-	}
-
-	@Bean
-	@Override
-	public AuthenticationManager authenticationManagerBean() throws Exception {
-		return super.authenticationManagerBean();
 	}
 
 	@Bean

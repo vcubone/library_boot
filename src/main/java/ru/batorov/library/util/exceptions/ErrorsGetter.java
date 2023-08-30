@@ -1,4 +1,4 @@
-package ru.batorov.library.util;
+package ru.batorov.library.util.exceptions;
 
 import java.util.List;
 

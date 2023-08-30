@@ -1,4 +1,4 @@
-package ru.batorov.library.dto;
+package ru.batorov.library.dto.book;
 
 public class BookUsersInfoDTO extends BookUserDTO{
 	public boolean expired;

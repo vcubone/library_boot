@@ -61,6 +61,8 @@ public class Person {
 	private LocalDateTime created_at;
 	@Column(name = "updated_at")
 	private LocalDateTime updated_at;
+    @Column(name = "version")
+    private Integer version;
     
     public Person() {
     }
@@ -135,6 +137,14 @@ public class Person {
 
     public void setUpdated_at(LocalDateTime updated_at) {
         this.updated_at = updated_at;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
     }
 
 }

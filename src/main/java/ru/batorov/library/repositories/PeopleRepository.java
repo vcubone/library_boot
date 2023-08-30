@@ -13,4 +13,11 @@ public interface PeopleRepository extends JpaRepository<Person, Integer>{
     Optional<Person> findByUsername(String username);
     @Query("SELECT DISTINCT p FROM Person p LEFT JOIN FETCH p.roles")
     List<Person> findAllWithRoles();
+    
+    @Query(
+        value = "SELECT distinct p.id, p.username, r.id, r.name from person p left join person_role pr on p.id = pr.person_id LEFT JOIN role r on r.id = pr.role_id where p.id = :personId",
+        nativeQuery = true
+    )
+    @Deprecated
+    Person getAuthenticationsInformation(Integer personId);
 }

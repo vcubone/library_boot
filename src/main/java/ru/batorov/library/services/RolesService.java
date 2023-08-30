@@ -2,13 +2,12 @@ package ru.batorov.library.services;
 
 
 import java.util.List;
-import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ru.batorov.library.models.Role;
 import ru.batorov.library.repositories.RolesRepository;
+import ru.batorov.library.util.exceptions.RoleNotFoundException;
 
 @Service
 @Transactional(readOnly = true)
@@ -22,8 +21,12 @@ public class RolesService {
 	public List<Role> all(){
 		return rolesRepository.findAll();
 	}
-	Optional<Role> getRoleByName(String name)
+	public Role getRoleByName(String name)
 	{
-		return rolesRepository.findByName(name);
+		return rolesRepository.findByName(name).orElseThrow(() -> new RoleNotFoundException(name));
+	}
+	public List<Role> findPersonsRoles(Integer personId)
+	{
+		return rolesRepository.findRolesByPersonId(personId);
 	}
 }
