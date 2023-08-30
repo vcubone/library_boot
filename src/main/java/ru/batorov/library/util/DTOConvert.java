@@ -22,6 +22,9 @@ import ru.batorov.library.models.Book;
 import ru.batorov.library.models.Person;
 import ru.batorov.library.models.Role;
 
+/**
+ * Convert Entities to DTO and vice versa
+ */
 public class DTOConvert {
 	private DTOConvert() {
 		throw new AssertionError();

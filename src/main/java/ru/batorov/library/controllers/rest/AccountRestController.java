@@ -3,7 +3,7 @@ package ru.batorov.library.controllers.rest;
 import java.util.Collection;
 import javax.validation.Valid;
 
-import static ru.batorov.library.util.AuthenticationHelper.getUserIdByAuthentication;
+import static ru.batorov.library.util.AuthenticationHelper.*;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -49,7 +49,7 @@ public class AccountRestController {
 	@GetMapping("/main")
 	@Operation(summary = "Shows your account main information", tags = "Account", security = @SecurityRequirement(name = "Bearer Authentication"))
 	public PersonWithBooksUserDTO userInfo(@ApiIgnore Authentication authentication) {
-		Person person = peopleService.getPersonById(getUserIdByAuthentication(authentication));
+		Person person = peopleService.getPersonByUsername(getUsernameByAuthentication(authentication));
 		PersonWithBooksUserDTO PersonWithBooksUserDTO = convertToPersonWithBooksUserDTO(person, modelMapper);
 
 		Collection<Book> books = peopleService.findBooksByPersonId(person.getId());
@@ -71,7 +71,7 @@ public class AccountRestController {
 		if (bindingResult.hasErrors()) {
 			throw new IllegalArgumentException(ErrorsGetter.getErrors(bindingResult));
 		}
-		peopleService.update(getUserIdByAuthentication(authentication), person);
+		peopleService.update(getUsernameByAuthentication(authentication), person);
 		return ResponseEntity.ok(HttpStatus.OK);
 	}
 
@@ -86,7 +86,7 @@ public class AccountRestController {
 		}
 		Person person = converToPerson(passwordDTO, modelMapper);
 
-		peopleService.update(getUserIdByAuthentication(authentication), person);
+		peopleService.update(getUsernameByAuthentication(authentication), person);
 		return ResponseEntity.ok(HttpStatus.OK);
 	}
 }

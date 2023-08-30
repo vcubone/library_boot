@@ -12,7 +12,7 @@ public interface RolesRepository extends JpaRepository<Role, Integer> {
 	Optional<Role> findByName(String name);
 	//@Query("SELECT p.roles FROM Person p LEFT JOIN p.roles where p.id = :personId")
 	@Query(
-		value = "select r.* from role r left join person_role pr on r.id = pr.role_id where pr.person_id = 1",
+		value = "select r.* from role r left join person_role pr on r.id = pr.role_id where pr.person_id = :personId",
 		nativeQuery = true
 	)
 	List<Role> findRolesByPersonId(Integer personId);

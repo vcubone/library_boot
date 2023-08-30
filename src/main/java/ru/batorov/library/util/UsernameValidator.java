@@ -7,6 +7,9 @@ import org.springframework.validation.Validator;
 import ru.batorov.library.models.Person;
 import ru.batorov.library.services.PeopleService;
 
+/**
+ * Validator checks if persons username is unique.
+ */
 @Component
 public class UsernameValidator implements Validator {
 	private final PeopleService peopleService;

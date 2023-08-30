@@ -80,7 +80,7 @@ public class BookRestController {
             if (authentif != null && authentif.isAuthenticated())
             {
                 // not admin or owner -> empty person
-                if(!hasRoleByAuthentication(authentif, "ROLE_ADMIN") && getUserIdByAuthentication(authentif) != book.getOwner().getId())
+                if(!hasRoleByAuthentication(authentif, "ROLE_ADMIN") && getUsernameByAuthentication(authentif) != book.getOwner().getUsername())
                     book.setOwner(new Person());
             } else
             book.setOwner(new Person());
