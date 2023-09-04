@@ -10,20 +10,21 @@
         <header th:insert="~{blocks/header :: header}"></header>
 
         
-        <form th:method="GET" th:action="@{/books/search}">
+        <form th:method="GET" th:action="@{/books/search}" id = "search">
             <label for="findRequest">Введите поисковой запрос: </label>
             <input type="text" id="findRequest" name="findRequest"/>
             <br/>
             <input type="submit" value="Искать!"/>
         </form>
         
-        <div th:if="${bookUserDTOs}">
-            <div th:if="${bookUserDTOs.isEmpty()}">
+        <div th:if="${bookUserDTOs}" id="findResult">
+            <div th:if="${bookUserDTOs.isEmpty()}" id="noBooks">
                 Книг не найдено
             </div>
-            
-            <div th:each="bookUserDTO : ${bookUserDTOs}">
-                <a th:href="@{/books/{id}(id=${bookUserDTO.getId()})}" th:text="${bookUserDTO.getTitle() + ', ' + bookUserDTO.getAuthor() + ', ' + bookUserDTO.getReleaseYear}">bookUserDTO</a>
+            <div th:unless="${bookUserDTOs.isEmpty()}" id = "books">
+                <div th:each="bookUserDTO : ${bookUserDTOs}">
+                    <a th:href="@{/books/{id}(id=${bookUserDTO.getId()})}" th:text="${bookUserDTO.getTitle() + ', ' + bookUserDTO.getAuthor() + ', ' + bookUserDTO.getReleaseYear}">bookUserDTO</a>
+                </div>
             </div>
         </div>
         

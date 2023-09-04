@@ -36,6 +36,6 @@ public class GlobalControllerExceptionHandler {
 	@ExceptionHandler({PersonNotFoundException.class, RoleNotFoundException.class, BookNotFoundException.class})
 	private ResponseEntity<ErrorResponse> handlerException(RuntimeException e) {
 		ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), System.currentTimeMillis());
-		return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);// 500
+		return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);// 404
 	}
 }

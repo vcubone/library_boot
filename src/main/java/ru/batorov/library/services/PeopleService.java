@@ -185,6 +185,7 @@ public class PeopleService implements UserDetailsService {
     public Person register(Person person) {
         person.setPassword(passwordEncoder.encode(person.getPassword()));
         person.setRoles(Set.of(rolesService.getRoleByName("ROLE_USER")));
+        person.setVersion(1);
         save(person);
         return person;
     }

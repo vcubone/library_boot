@@ -44,10 +44,11 @@ public class BookController {
 
     @GetMapping()
     public String all(Model model,
-            @RequestParam(value = "sortByYear", required = false) boolean sortByYear,
+            @RequestParam(value = "sortByYear", required = false) Boolean sortByYear,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "itemsPerPage", required = false) Integer itemsPerPage) {
-        System.out.println("test\n");
+        if (sortByYear == null)
+            sortByYear = false;
         List<Book> books = page == null || itemsPerPage == null ? bookService.all(sortByYear)
                 : bookService.all(sortByYear, page, itemsPerPage);
         model.addAttribute("bookUserDTOs", convertToBookUserDTOCollection(books, modelMapper));
