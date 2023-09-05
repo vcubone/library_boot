@@ -4,8 +4,8 @@ create table IF NOT EXISTS person(
     password varchar(70) not null,
     full_name varchar(100) not null,
     year_of_birth int not null,
-    created_at timestamp not null DEFAULT CURRENT_TIMESTAMP,
-    updated_at timestamp not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at timestamp not null DEFAULT CURRENT_TIMESTAMP DEFAULT ON NULL,
+    updated_at timestamp not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP DEFAULT ON NULL,
     version int not null DEFAULT 1
 );
 CREATE TABLE if NOT EXISTS role(
@@ -23,7 +23,7 @@ create table IF NOT EXISTS book(
     title varchar(100) not null,
     author varchar(100) not null,
     release_year int not null,
-	take_time timestamp DEFAULT CURRENT_TIMESTAMP,
-    created_at timestamp not null DEFAULT CURRENT_TIMESTAMP,
-    updated_at timestamp not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP	
+	take_time timestamp DEFAULT CURRENT_TIMESTAMP DEFAULT ON NULL,
+    created_at timestamp not null DEFAULT CURRENT_TIMESTAMP DEFAULT ON NULL,
+    updated_at timestamp not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP	DEFAULT ON NULL
 );

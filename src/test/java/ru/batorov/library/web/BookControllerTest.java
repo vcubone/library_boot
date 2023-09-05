@@ -3,7 +3,9 @@ package ru.batorov.library.web;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
@@ -37,7 +39,11 @@ public class BookControllerTest {
 	private final String WarAndPeace = "War and Peace";
 	private final String TheHound = "The Hound of the Baskervilles";
 	private final String EffectiveJava = "Effective Java";
-	
+	private final String adminsUsername = "ad";
+	private final String userOneUsername = "user1";
+	private final String userTwoUsername = "user2";
+	private final String book_list = "//*[@id=\"books-list\"]/div";
+
 	public BookControllerTest() {
 	}
 
@@ -48,10 +54,10 @@ public class BookControllerTest {
 
 	@Nested
 	class Books {
-		private final String book_list = "//*[@id=\"books-list\"]/div";
 		private final String firstBook = "//*[@id=\"books-list\"]/div[1]/a";
 		private final String secondBook = "//*[@id=\"books-list\"]/div[2]/a";
 		private final String thirdBook = "//*[@id=\"books-list\"]/div[3]/a";
+		private final String newBook = "//*[@id=\"newBook\"]";
 
 		@Test
 		public void books() throws Exception {
@@ -150,6 +156,29 @@ public class BookControllerTest {
 					.andExpect(xpath(book_list).nodeCount(1))
 					.andExpect(xpath(firstBook).string(containsString(EffectiveJava)));
 		}
+
+		@Test
+		public void newBookDoesNotExistsForUnAuthorized() throws Exception {
+			mvc.perform(get("/books")).andDo(print())
+					.andExpect(status().isOk())
+					.andExpect(xpath(newBook).doesNotExist());
+		}
+
+		@WithUserDetails(userOneUsername)
+		@Test
+		public void newBookDoesNotExistsForUser() throws Exception {
+			mvc.perform(get("/books")).andDo(print())
+					.andExpect(status().isOk())
+					.andExpect(xpath(newBook).doesNotExist());
+		}
+
+		@WithUserDetails(adminsUsername)
+		@Test
+		public void newBookExistsForAdmin() throws Exception {
+			mvc.perform(get("/books")).andDo(print())
+					.andExpect(status().isOk())
+					.andExpect(xpath(newBook).exists());
+		}
 	}
 
 	@Nested
@@ -240,7 +269,7 @@ public class BookControllerTest {
 		}
 
 		@Test
-		@WithUserDetails("user1")
+		@WithUserDetails(userOneUsername)
 		public void bookIdUserWithBooks() throws Exception {
 			mvc.perform(get("/books/1")).andDo(print()).andExpect(status().isOk())
 					.andExpect(xpath(owner).exists())
@@ -265,7 +294,7 @@ public class BookControllerTest {
 		}
 
 		@Test
-		@WithUserDetails("user2")
+		@WithUserDetails(userTwoUsername)
 		public void bookIdUserNoBooks() throws Exception {
 			mvc.perform(get("/books/1")).andDo(print()).andExpect(status().isOk())
 					.andExpect(xpath(owner).exists())
@@ -290,7 +319,7 @@ public class BookControllerTest {
 		}
 
 		@Test
-		@WithUserDetails("ad")
+		@WithUserDetails(adminsUsername)
 		public void bookIdAdmin() throws Exception {
 			mvc.perform(get("/books/1")).andDo(print()).andExpect(status().isOk())
 					.andExpect(xpath(owner).exists())
@@ -314,4 +343,37 @@ public class BookControllerTest {
 					.andExpect(xpath(addownerUser).doesNotExist());
 		}
 	}
+
+	@Nested
+	class NewBook {
+		@Test
+		public void accessDeniedUnAuthorized() throws Exception {
+			mvc.perform(get("/books/new")).andDo(print()).andExpect(status().is3xxRedirection())
+					.andExpect(redirectedUrl("http://localhost/auth/login"));
+		}
+
+		@Test
+		@WithUserDetails(userOneUsername)
+		public void accessDeniedUser() throws Exception {
+			mvc.perform(get("/books/new")).andDo(print()).andExpect(status().isForbidden());
+		}
+
+		@Test
+		@WithUserDetails(adminsUsername)
+		public void getRequestAdmin() throws Exception {
+			mvc.perform(get("/books/new")).andDo(print()).andExpect(status().isOk());
+		}
+
+		@Test
+		@WithUserDetails(adminsUsername)
+		public void createNewBookAdmin() throws Exception {
+			mvc.perform(post("/books/new").contentType(MediaType.APPLICATION_FORM_URLENCODED).content("title=newTitle&author=newAuthor&releaseYear=1").with(SecurityMockMvcRequestPostProcessors.csrf()))
+					.andDo(print()).andExpect(status().is3xxRedirection())
+					.andExpect(redirectedUrl("/books"));
+
+			mvc.perform(get("/books/4")).andDo(print()).andExpect(status().isOk());//TODO проверить, что это нужная книга
+		}
+
+	}
+
 }
