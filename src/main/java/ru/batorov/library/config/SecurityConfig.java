@@ -39,9 +39,9 @@ public class SecurityConfig {
 			"/swagger-ui/**"
 	};
 	private static final String[] USER_WHITELIST = {
-			"/books/{bookId}/addowner",
-			"/books/{bookId}/release",
-			"/account/**"
+			"/books/\\d+/addowner",
+			"/books/\\d+/release",
+			"/account/.+"
 	};
 	private static final String[] ALL_WHITELIST = {
 			"/auth/register",
@@ -49,7 +49,6 @@ public class SecurityConfig {
 			"/error",
 			"/",
 			"/books",
-			"/books/{bookId}",
 			"/books/search"
 	};
 	private static final String[] ALL_API_WHITELIST = Stream.of(ALL_WHITELIST).map(str -> "/api" + str)
@@ -90,8 +89,9 @@ public class SecurityConfig {
 						.sessionFixation().newSession())
 				.antMatcher("/api/**") // <= Security only available for /api/**
 				.authorizeHttpRequests()
+				.regexMatchers("/api/books/-?\\d+").permitAll()
 				.antMatchers(ALL_API_WHITELIST).permitAll()
-				.antMatchers(USER_API_WHITELIST).hasRole("USER")
+				.regexMatchers(USER_API_WHITELIST).hasRole("USER")
 				.anyRequest().hasAnyRole("ADMIN")
 				.and()
 				.addFilterBefore(new JwtFilter(jwtTokenProvider, peopleService),
@@ -107,8 +107,9 @@ public class SecurityConfig {
 						management -> management.maximumSessions(2).sessionRegistry(getSessionRegistry()))
 				.authorizeHttpRequests()
 				.antMatchers(SWAGGER_WHITELIST).permitAll()
+				.regexMatchers("/books/-?\\d+").permitAll()
 				.antMatchers(ALL_WHITELIST).permitAll()
-				.antMatchers(USER_WHITELIST).hasRole("USER")
+				.regexMatchers(USER_WHITELIST).hasRole("USER")
 				.anyRequest().hasAnyRole("ADMIN")
 				.and()
 				.formLogin(login -> login.loginPage("/auth/login")
