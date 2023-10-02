@@ -1,2 +1,2 @@
-delete from person;
-ALTER table person ALTER column id restart with 1;
+delete from person;;
+ALTER table person ALTER column id restart with 1;;

@@ -97,7 +97,7 @@ public class BookRestController {
         Book book = converToBook(bookAdminDTO, modelMapper);
         if (bindingResult.hasErrors())
             throw new IllegalArgumentException(ErrorsGetter.getErrors(bindingResult));
-        bookService.save(book);
+        bookService.create(book);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 

@@ -1,5 +1,6 @@
 package ru.batorov.library.services;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -185,6 +186,8 @@ public class PeopleService implements UserDetailsService {
     public Person register(Person person) {
         person.setPassword(passwordEncoder.encode(person.getPassword()));
         person.setRoles(Set.of(rolesService.getRoleByName("ROLE_USER")));
+        person.setCreated_at(LocalDateTime.now());
+        person.setUpdated_at(person.getCreated_at());
         person.setVersion(1);
         save(person);
         return person;

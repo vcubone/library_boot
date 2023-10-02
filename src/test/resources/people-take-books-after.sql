@@ -1,1 +1,1 @@
-UPDATE book SET person_id = null;
+UPDATE book SET person_id = null;;

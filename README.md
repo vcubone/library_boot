@@ -8,7 +8,7 @@ Component           | Technology
 Frontend            | HTML
 Backend (WEB & REST)| [SpringBoot](https://projects.spring.io/spring-boot) (Java)
 Security            | Session Based (Spring Security)
-DB                  | MySQL
+DB                  | PostgreSQL
 Persistence         | JPA (Using Spring Data)
 Server Build Tools  | Maven(Java) or Gradle
 Documentation tools | Swagger
@@ -24,8 +24,8 @@ PROJECT_FOLDER
 │     └──[java/ru/batorov/library]      
 │     └──[resources]
 │        │  application.properties.origin #contains pattern of springboot cofigurations
-│        │  schema-mysql.sql  # Contains DB Script to create tables that executes during the App Startup          
-│        │  data-mysql.sql    # Contains DB Script to Insert data that executes during the App Startup (after schema.sql)
+│        │  schema-postgresql.sql  # Contains DB Script to create tables that executes during the App Startup          
+│        │  data-postgresql.sql    # Contains DB Script to Insert data that executes during the App Startup (after schema.sql)
 │        └──[templates]    # keep all html,css etc, resources
 │  └──[test]             #Contains tests
 │
@@ -78,25 +78,28 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - spring.datasource.url=jdbc:mysql://mysqldb:3306/bootdb
-      - spring.datasource.username=root
-      - spring.datasource.password=root
+      - spring.datasource.url=jdbc:postgresql://postgresqldb:5432/bootdb
+      - spring.datasource.username=postgres
+      - spring.datasource.password=password
+      - jwt_secret=secret
     networks:
       - testnetwork
     depends_on:
-      mysqldb:
+      postgresqldb:
         condition: service_healthy
  
-  mysqldb:
-    image: mysql:5.7
+  postgresqldb:
+    image: postgres:16-alpine
     networks:
       - testnetwork
     environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=bootdb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=bootdb
     healthcheck:
-            test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
-            timeout: 20s
+            test: ["CMD", "pg_isready" ,"-d", "bootdb"]
+            interval: 5s
+            timeout: 5s
             retries: 10
 
 networks:

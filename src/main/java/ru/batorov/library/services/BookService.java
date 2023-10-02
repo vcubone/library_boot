@@ -1,5 +1,6 @@
 package ru.batorov.library.services;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -77,7 +78,9 @@ public class BookService {
      *                                           database.
      */
     @Transactional
-    public Book save(Book book) {
+    public Book create(Book book) {
+        book.setCreated_at(LocalDateTime.now());
+        book.setUpdated_at(book.getCreated_at());
         bookRepository.save(book);
         return book;
     }

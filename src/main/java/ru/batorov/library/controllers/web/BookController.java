@@ -98,7 +98,7 @@ public class BookController {
         Book book = converToBook(bookAdminDTO, modelMapper);
         if (bindingResult.hasErrors())
             return "books/new";
-        bookService.save(book);
+        bookService.create(book);
         return "redirect:/books";
     }
 
