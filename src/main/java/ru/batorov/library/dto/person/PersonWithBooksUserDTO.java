@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
 
 import ru.batorov.library.dto.book.BookUsersInfoDTO;
 
-public class PersonWithBooksUserDTO {
+public class PersonWithBooksUserDTO implements PersonDTOInterface {
 	private Integer id;
 	
     @NotEmpty(message = "name shouldn't be empty")

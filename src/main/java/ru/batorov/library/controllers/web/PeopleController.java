@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.validation.Valid;
 
-import ru.batorov.library.dto.RegistrationDTO;
 import ru.batorov.library.dto.RoleDTO;
 import ru.batorov.library.dto.credentials.PasswordDTO;
 import ru.batorov.library.dto.person.PersonAdminDTO;
+import ru.batorov.library.dto.person.PersonRegistrationDTO;
 import ru.batorov.library.models.Person;
 import ru.batorov.library.models.Role;
 import ru.batorov.library.services.PeopleService;
@@ -56,12 +56,12 @@ public class PeopleController {
     }
 
     @GetMapping("/new")
-    public String newPerson(@ModelAttribute("registrationDTO") RegistrationDTO registrationDTO) {
+    public String newPerson(@ModelAttribute("registrationDTO") PersonRegistrationDTO registrationDTO) {
         return "people/new";
     }
 
     @PostMapping("/new")
-    public String performRegistration(@ModelAttribute("registrationDTO") @Valid RegistrationDTO registrationDTO,
+    public String performRegistration(@ModelAttribute("registrationDTO") @Valid PersonRegistrationDTO registrationDTO,
             BindingResult bindingResult) {
         Person person = modelMapper.map(registrationDTO, Person.class);
 

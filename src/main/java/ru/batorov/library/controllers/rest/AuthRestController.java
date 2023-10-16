@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import ru.batorov.library.dto.RegistrationDTO;
 import ru.batorov.library.dto.credentials.CredentialsUserDTO;
+import ru.batorov.library.dto.person.PersonRegistrationDTO;
 import ru.batorov.library.models.Person;
 import ru.batorov.library.security.jwt.JwtProvider;
 import ru.batorov.library.services.PeopleService;
@@ -66,7 +66,7 @@ public class AuthRestController {
 	
 	@PostMapping("/register")
 	@Operation(summary = "Register page", description = "Returns jwt token like: \"jwt-token\" : {jwt token}", tags = "Auth")
-	public Map<String, String> performRegistration(@RequestBody @Valid RegistrationDTO registrationDTO,
+	public Map<String, String> performRegistration(@RequestBody @Valid PersonRegistrationDTO registrationDTO,
 			@ApiIgnore BindingResult bindingResult) {
 		Person person = converToPerson(registrationDTO, modelMapper);
 

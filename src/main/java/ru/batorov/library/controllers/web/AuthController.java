@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import ru.batorov.library.dto.RegistrationDTO;
+import ru.batorov.library.dto.person.PersonRegistrationDTO;
 import ru.batorov.library.models.Person;
 import ru.batorov.library.services.PeopleService;
 import ru.batorov.library.util.UsernameValidator;
@@ -35,13 +35,13 @@ public class AuthController {
 	}
 
 	@GetMapping("/register")
-	public String registraionPage(@ModelAttribute("registrationDTO") RegistrationDTO registrationDTO) {
+	public String registraionPage(@ModelAttribute("registrationDTO") PersonRegistrationDTO registrationDTO) {
 		System.out.println("registrPage");
 		return "auth/register";
 	}
 
 	@PostMapping("/register")
-	public String performRegistration(@ModelAttribute("registrationDTO") @Valid RegistrationDTO registrationDTO,
+	public String performRegistration(@ModelAttribute("registrationDTO") @Valid PersonRegistrationDTO registrationDTO,
 			BindingResult bindingResult) {
 		Person person = modelMapper.map(registrationDTO, Person.class);
 

@@ -31,3 +31,7 @@ build/
 ### VS Code ###
 .vscode/
 src/main/resources/application-dev.properties
+src/test/java/ru/batorov/library/integration/
+src/test/resources/data-h2.sql
+src/test/resources/schema-h2.sql
+src/test/resources/integration/

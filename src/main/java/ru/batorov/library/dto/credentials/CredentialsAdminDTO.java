@@ -3,7 +3,9 @@ package ru.batorov.library.dto.credentials;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-public class CredentialsAdminDTO {
+import ru.batorov.library.dto.person.PersonDTOInterface;
+
+public class CredentialsAdminDTO implements PersonDTOInterface {
 	private Integer id;
 	
 	@NotEmpty(message = "name shouldn't be empty")

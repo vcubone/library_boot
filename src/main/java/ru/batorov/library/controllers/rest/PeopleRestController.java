@@ -22,11 +22,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import ru.batorov.library.dto.RegistrationDTO;
 import ru.batorov.library.dto.RoleDTO;
 import ru.batorov.library.dto.credentials.PasswordDTO;
 import ru.batorov.library.dto.person.PersonAdminDTO;
 import ru.batorov.library.dto.person.PersonWithBooksAdminDTO;
+import ru.batorov.library.dto.person.PersonRegistrationDTO;
 import ru.batorov.library.models.Person;
 import ru.batorov.library.services.PeopleService;
 import ru.batorov.library.util.UsernameValidator;
@@ -57,7 +57,7 @@ public class PeopleRestController {
     @PostMapping("/new")
     @Operation(summary = "Creates new person", tags = "People", security = @SecurityRequirement(name = "Bearer Authentication"))
     @ApiResponse(responseCode = "400", description = "Bad input values")
-    public ResponseEntity<HttpStatus> performRegistration(@RequestBody @Valid RegistrationDTO registrationDTO,
+    public ResponseEntity<HttpStatus> performRegistration(@RequestBody @Valid PersonRegistrationDTO registrationDTO,
             BindingResult bindingResult) {
         Person person = modelMapper.map(registrationDTO, Person.class);
 

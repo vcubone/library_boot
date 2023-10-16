@@ -1,10 +1,10 @@
-package ru.batorov.library.dto;
+package ru.batorov.library.dto.person;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
-public class RegistrationDTO {
+public class PersonRegistrationDTO implements PersonDTOInterface {
     @NotEmpty(message = "username shouldn't be empty")
     @Size(min = 2, max = 30, message = "Name between 2 and 30")
     private String username;

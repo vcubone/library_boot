@@ -29,6 +29,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import ru.batorov.library.dto.book.BookAdminDTO;
+import ru.batorov.library.dto.book.BookCreationDTO;
 import ru.batorov.library.dto.book.BookOwnerDTO;
 import ru.batorov.library.dto.book.BookUserDTO;
 import ru.batorov.library.models.Book;
@@ -92,9 +93,9 @@ public class BookRestController {
     @PostMapping("/new")
     @Operation(summary = "Creates a new book", description = "Admins only", tags = "Books", security = @SecurityRequirement(name = "Bearer Authentication"))
     @ApiResponse(responseCode = "400", description = "Bad input values")
-    public ResponseEntity<HttpStatus> create(@RequestBody @Valid BookAdminDTO bookAdminDTO,
+    public ResponseEntity<HttpStatus> create(@RequestBody @Valid BookCreationDTO bookCreationDTO,
             @ApiIgnore BindingResult bindingResult) {
-        Book book = converToBook(bookAdminDTO, modelMapper);
+        Book book = converToBook(bookCreationDTO, modelMapper);
         if (bindingResult.hasErrors())
             throw new IllegalArgumentException(ErrorsGetter.getErrors(bindingResult));
         bookService.create(book);

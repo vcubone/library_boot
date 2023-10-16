@@ -71,6 +71,21 @@ public class Book {
         this.author = author;
         this.releaseYear = releaseYear;
     }
+    
+    static public Book shallowCopy(Book that){
+        Book result = new Book();
+        result.setAuthor(that.getAuthor());
+        result.setCreated_at(that.getCreated_at());
+        result.setExpired(that.isExpired());
+        result.setId(that.getId());
+        result.setOwner(that.getOwner());
+        result.setReleaseYear(that.getReleaseYear());
+        result.setTakeTime(that.getTakeTime());
+        result.setTitle(that.getTitle());
+        result.setUpdated_at(that.getUpdated_at());
+        return result;
+    }
+    
 
     public Person getOwner() {
         return owner;

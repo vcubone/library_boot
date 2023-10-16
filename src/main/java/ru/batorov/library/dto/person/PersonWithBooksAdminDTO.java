@@ -9,7 +9,7 @@ import javax.validation.constraints.Size;
 import ru.batorov.library.dto.RoleDTO;
 import ru.batorov.library.dto.book.BookAdminDTO;
 
-public class PersonWithBooksAdminDTO {
+public class PersonWithBooksAdminDTO implements PersonDTOInterface {
 	private Integer id;
 	
     @NotEmpty(message = "name shouldn't be empty")
