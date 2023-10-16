@@ -6,12 +6,13 @@ Application to demonstrate various parts of a service oriented SpringBoot applic
 Component           | Technology
 ---                 | ---
 Frontend            | HTML
-Backend (WEB & REST)| [SpringBoot](https://projects.spring.io/spring-boot) (Java)
+Backend (WEB & REST)| [SpringBoot](https://localhost:8080/) (Java)
 Security            | Session Based (Spring Security)
 DB                  | PostgreSQL
 Persistence         | JPA (Using Spring Data)
 Server Build Tools  | Maven(Java) or Gradle
 Documentation tools | Swagger
+Test Tools          | Junit
 
 ## Folder Structure
 ```bash
@@ -35,12 +36,13 @@ PROJECT_FOLDER
 Ensure you have this installed before proceeding further
 - Java 19
 - Maven 2.7.13
-- MySQL Server 5.7.24
+- PostgreSQL 16.0
+- Docker(Optional)
 
 ## About
-This is an implementation of an library website with authentication and authorization .
+This is an implementation of an library website with authentication and authorization.
 The goal of the project is to 
-- Highlight techniques of making a website using [SpringBoot](https://projects.spring.io/spring-boot)
+- Highlight techniques of making a website using [SpringBoot](https://localhost:8080/)
 
 ### Features of the Project
 * Backend
@@ -56,12 +58,13 @@ The goal of the project is to
   * The ability to launch the applications image from dockerhub
  
 ### Build (SpringBoot Java)
-* Start MySQL Server
+* Start PostgreSQL Server
 * Add variables
 ```bash
 spring.datasource.url=
 spring.datasource.username=
 spring.datasource.password=
+jwt_secret=
 ```
 * Run the command
 ```
