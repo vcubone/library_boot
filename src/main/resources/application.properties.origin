@@ -1,0 +1,13 @@
+spring.datasource.driver-class-name=
+spring.datasource.url=
+spring.datasource.username=
+spring.datasource.password=
+
+#конфигурация hibernate
+spring.jpa.properties.hibernate.dialect=
+#для put patch delete
+spring.mvc.hiddenmethod.filter.enabled=true
+#для старой naming strategy
+spring.jpa.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+spring.mvc.pathmatch.matching-strategy: ANT_PATH_MATCHER
+spring.jpa.open-in-view=false

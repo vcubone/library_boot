@@ -1,0 +1,19 @@
+<div th:fragment="header">
+    <div class="container">
+        <header class="d-flex justify-content-center py-3">
+        <ul class="nav nav-pills">
+            <li class="nav-item"><a th:href="@{/}" class="nav-link">Домашняя страница</a></li>
+            <li class="nav-item"><a th:href="@{/books}" class="nav-link">Книги</a></li>
+            <li sec:authorize="hasRole('ADMIN')" class="nav-item"><a th:href="@{/people}" class="nav-link">Читатели</a></li>
+            <li sec:authorize="hasRole('ADMIN')" class="nav-item"><a th:href="@{/admin}" class="nav-link">Админка</a></li>
+            <li sec:authorize="!isAuthenticated()" class="nav-item"><a th:href="@{/auth/login}" class="nav-link">Войти в аккаунт</a></li>
+            <li sec:authorize="isAuthenticated()" class="nav-item"><a th:href="@{/account/main}" class="nav-link">Мой профиль</a></li>
+            <li sec:authorize="isAuthenticated()" class="nav-item">
+                <form th:action="@{/logout}" th:method="POST">
+                    <input type="submit" value="Logout" />
+                </form>
+            </li>
+        </ul>
+        </header>
+    </div>
+</div>

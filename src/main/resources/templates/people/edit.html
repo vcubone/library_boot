@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Редактировать читателя</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"/>
+
+</head>
+<body>
+    <header th:insert="~{blocks/header :: header}"></header>
+    <form th:method="PATCH" th:action="@{/people/{personId}/edit(personId=${personAdminDTO.getId()})}" th:object="${personAdminDTO}">
+        <label for="fullName">Введите ФИО: </label>
+        <input type="text" th:field="*{fullName}" id="fullName"/>
+        <div style="color:red" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}">Full Name Error</div>
+        <br/>
+        <label for="yearOfBirth">Введите год рождения: </label>
+        <input type="text" th:field="*{yearOfBirth}" id="yearOfBirth"/>
+        <div style="color:red" th:if="${#fields.hasErrors('yearOfBirth')}" th:errors="*{yearOfBirth}">yearOfBirth Error</div>
+        <br/>
+        <input type="submit" value="Редактировать!"/>
+    </form>
+    <a th:href="@{/people/{personId}/credentials/edit(personId=${personAdminDTO.getId()})}">Редактировать учетные данные</a>
+    
+    <form th:method="PATCH" th:action="@{/people/{personId}/edit/deleterole(personId=${personAdminDTO.getId()})}">
+        <label for="addRole">Удалить роль:</label>
+        <select th:object="${roleDTO}" th:field="*{name}" id="addRole">
+            <option th:each="roleDTO : ${personAdminDTO.getRoles()}" th:value="${roleDTO.getName()}" th:text="${roleDTO.getName()}">
+            </option>
+        </select>
+        <input type="submit" value="Удалить" />
+    </form>
+    <form th:method="PATCH" th:action="@{/people/{personId}/edit/addrole(personId=${personAdminDTO.getId()})}">
+        <label for="addRole">Добавить роль:</label>
+        <select th:object="${roleDTO}" th:field="*{name}" id="addRole">
+            <option th:each="roleDTO : ${allRolesDTO}" th:value="${roleDTO.getName()}"
+                th:text="${roleDTO.getName()}"></option>
+        </select>
+        <input type="submit" value="Добавить" />
+    </form>
+    
+    
+    <footer th:insert="~{blocks/footer :: footer}"></footer>
+</body>
+</html>
